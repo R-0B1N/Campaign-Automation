@@ -1,11 +1,16 @@
 /*
- * Phase 4: The Main Script (Multi-language & No-Logo)
- * Connects Lark API to Image Renderer, selecting text based on language
- * and handling cases with or without a partner logo.
- */
+* index.js
+* Main automation script to process Lark records and generate banners.
+* Uses lark-api.js to interact with Lark and renderer.js to generate images.
+*/
 
-const { getPendingRecords, updateRecordStatus } = require('./lark-api.js');
+const { 
+    getPendingRecords, 
+    // updateRecordStatus, 
+    downloadAttachmentUrlAsBase64 // <-- Import the new function
+} = require('./lark-api.js');
 const { generateImage } = require('./renderer.js');
+const path = require('path'); // <-- NEW: Import path module
 
 // --- Language Slogan Mapping ---
 const slogans = {
@@ -44,12 +49,10 @@ const officialPartnerTexts = {
     'French': 'Partenaire officiel de WEEX',
     'Italian': 'Partner ufficiale WEEX',
     'Spanish (Spain)': 'Socio oficial de WEEX',
-    'Polish': 'Oficjalny partner WEEX',
+    'Polish': 'Ofiy partner WEEX',
     'Russian': 'Официальный партнер WEEX',
-    'Ukrainian': 'Офіційний партнер WEEX',
-    'Arabic Language': 'شريك رسمي لـ WEEX', // Right-to-left
-    'Portuguese': 'Parceiro Oficial da WEEX',
-    'Vietnamese': 'Đối tác chính thức của WEEX',
+    'Portuguese': "Parceiro Oficial da WEEX",
+    'Vietnamese': "Đối tác chính thức của WEEX",
     'Spanish (Latin Americe)': 'Socio oficial de WEEX'
      // Add others as needed
 };
@@ -59,53 +62,81 @@ const defaultPartnerText = officialPartnerTexts['English'];
 /**
  * Maps Lark column names to template keys, handles language and missing logos.
  * * ⚠️ ACTION REQUIRED: Verify ALL field names from your Lark sheet!
+ *
+ * *** UPDATED: This function is now async ***
  */
-function processRecord(record) {
+async function processRecord(record) {
     const fields = record.fields;
 
     // --- ⚠️ Verify field names! ---
     const kolName = fields['Name of KOL（Posters and materials used）'];
-    const kolLogoUrlRaw = fields['Has Profile picture or not']; // Read the raw value
+    const kolLogoAttachmentArray = fields['Has Profile picture or not']; // This is an ARRAY
     const language = fields['Target language'];
+    const ticketId = fields['自动编号']; // <-- NEW: For folder path
+    const kolUid = fields['UID of KOL']; // <-- NEW: For folder path
+    const activityRecord = fields['活动记录']; // <-- NEW: For folder path
     // --- End Verify ---
 
     // --- Basic validation ---
-    if (!kolName) {
-        console.warn(`Skipping record ${record.record_id}: Missing KOL Name.`);
+    if (!kolName || !ticketId || !kolUid || !activityRecord) {
+        console.warn(`Skipping record ${ticketId}: Missing required fields (KOL Name, Ticket ID, UID, or Activity Record).`);
         return null;
     }
      if (!language) {
-        console.warn(`Skipping record ${record.record_id}: Missing Target language.`);
+        console.warn(`Skipping record ${ticketId}: Missing Target language.`);
         return null; // Skip if no language is specified
     }
 
-    // --- Determine Logo URL (Handle missing/invalid) ---
+    // --- *** UPDATED: Determine Logo URL (Handle missing/invalid) *** ---
     let kolLogoUrl = null; // Default to null (triggers no-logo template)
-    if (kolLogoUrlRaw && typeof kolLogoUrlRaw === 'string' && kolLogoUrlRaw.trim().startsWith('http')) {
-        kolLogoUrl = kolLogoUrlRaw.trim(); // Use it only if it's a valid URL string
+    
+    if (Array.isArray(kolLogoAttachmentArray) && kolLogoAttachmentArray.length > 0) {
+        const firstAttachment = kolLogoAttachmentArray[0];
+        
+        // We need the FULL URL, which contains the 'extra' param for bitable attachments
+        if (firstAttachment && firstAttachment.url) {
+            try {
+                console.log(`Downloading image for record ${ticketId} (url: ${firstAttachment.url})...`);
+                // Call our new function with the full URL
+                kolLogoUrl = await downloadAttachmentUrlAsBase64(firstAttachment.url); // <--- USE NEW FUNCTION
+                console.log(`Successfully downloaded image for record ${ticketId}.`);
+            } catch (error) {
+                // Log the error but continue, will just use the no-logo template
+                console.error(`Failed to download image for record ${ticketId}: ${error.message}`);
+                kolLogoUrl = null; // Ensure it's null on failure
+            }
+        } else {
+            console.log(`Record ${ticketId}: Attachment found, but it has no 'url' property.`, firstAttachment);
+        }
     } else {
-        console.log(`Record ${record.record_id}: No valid logo URL found ('${kolLogoUrlRaw}'). Using no-logo template.`);
+        // This will catch records where the attachment cell is empty
+        console.log(`Record ${ticketId}: No attachment found in 'Has Profile picture or not'. Using no-logo template.`);
     }
+    // --- *** END NEW LOGIC ---
+
 
     // --- Get Localized Texts ---
     const sloganInfo = slogans[language] || defaultSlogan;
     const partnerText = officialPartnerTexts[language] || defaultPartnerText;
 
     if (!slogans[language]) {
-         console.warn(`Warning for record ${record.record_id}: Slogan language '${language}' not found. Using default.`);
+         console.warn(`Warning for record ${ticketId}: Slogan language '${language}' not found. Using default.`);
     }
      if (!officialPartnerTexts[language]) {
-         console.warn(`Warning for record ${record.record_id}: Partner text language '${language}' not found. Using default.`);
+         console.warn(`Warning for record ${ticketId}: Partner text language '${language}' not found. Using default.`);
     }
 
     return {
         kol_name: kolName,
-        kol_logo_url: kolLogoUrl, // Will be null if no valid URL was found
+        kol_logo_url: kolLogoUrl, // Will be the Base64 Data URI or null
         language: language,
         slogan_text: sloganInfo.text,
         text_direction: sloganInfo.dir,
         official_partner_text: partnerText, // NEW
-        record_id: record.record_id
+        record_id: ticketId,
+        ticket_id: ticketId, // <-- NEW: Pass to main
+        kol_uid: kolUid, // <-- NEW: Pass to main
+        activity_record: activityRecord // <-- NEW: Pass to main
     };
 }
 
@@ -120,21 +151,57 @@ async function main() {
         return;
     }
 
+    // Process records one by one (sequentially)
+    // This is safer for API rate limits and easier to log
     for (const record of records) {
-        const data = processRecord(record);
+        console.log(`--- Processing record ${ticketId} ---`);
+        
+        // *** ADDED await here ***
+        const data = await processRecord(record);
 
         if (data) {
-            const hasLogo = data.kol_logo_url ? 'logo' : 'no-logo'; // Add logo status to filename
-            const filename = `${data.kol_name.replace(/[^a-zA-Z0-9]/g, '_')}_${data.language}_${hasLogo}_banner.png`;
+            // --- UPDATED File Path Logic ---
+            const hasLogo = data.kol_logo_url ? 'logo' : 'no-logo';
+
+            // Simple function to sanitize strings for file/folder names
+            const sanitize = (str) => {
+                if (typeof str !== 'string' && typeof str !== 'number') {
+                    return '_unknown_';
+                }
+                // Replace problematic characters with an underscore
+                return String(str).replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/_+/g, '_');
+            }
             
-            await generateImage(data, filename);
+            // Sanitize all parts
+            const ticketId = sanitize(data.ticket_id);
+            const kolUid = sanitize(data.kol_uid);
+            const kolName = sanitize(data.kol_name);
+            const activityRecord = sanitize(data.activity_record);
+            const language = sanitize(data.language);
+
+            // Create the folder path structure: [TicketID]-[UID]-[KOLName]-[ActivityRecord]
+            const folderPath = `${ticketId}-${kolUid}-${kolName}-${activityRecord}`;
             
-            await updateRecordStatus(data.record_id);
+            // Create the final file name
+            const fileName = `${kolName}_${language}_${hasLogo}_namecard.png`;
+            
+            // Combine them for the renderer. 
+            // renderer.js automatically joins this with the 'banners' directory.
+            const relativeOutputPath = path.join(folderPath, fileName);
+            
+            console.log(`Generating banner at: /banners/${relativeOutputPath}`);
+            
+            await generateImage(data, relativeOutputPath); //
+            
+            // await updateRecordStatus(data.record_id);
         }
+        console.log(`--- Finished record ${ticketId} ---`);
     }
     
     console.log("Automation process complete.");
 }
 
-main();
-
+main().catch(error => {
+    console.error("A critical error occurred in main:", error);
+    process.exit(1);
+});

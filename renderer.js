@@ -18,8 +18,8 @@ async function generateImage(templateData, outputFilename) {
     console.log(`Starting generation for: ${outputFilename}`);
 
     // --- MODIFIED: Define all paths ---
-    const templateFilePath = path.resolve(__dirname, 'test.html');
-    const backgroundFileName = 'background-empty.png'; // Correct extension
+    const templateFilePath = path.resolve(__dirname, 'html-template/namecard.html');
+    const backgroundFileName = 'image-template/namecard-template.png';
     const absoluteBgPath = path.resolve(__dirname, backgroundFileName);
     const fullOutputPath = path.join(__dirname, 'banners', outputFilename);
     // --- End Modification ---
@@ -123,29 +123,28 @@ async function generateImage(templateData, outputFilename) {
 }
 
 // --- Test code ---
-// Ensure 'test.html' and 'background-empty.png' are in the same directory as this script.
 
-const sampleDataWithLogo = {
-    kol_name: "Test Partner With Logo",
-    kol_logo_url: "https://u.cubeupload.com/r0b1n/pfpkol1.jpg",
-    language: "English",
-    slogan_text: "WHERE NEW WEALTH IS MADE",
-    text_direction: "ltr",
-    official_partner_text: "Official WEEX Partner",
-    has_logo: true
-};
-generateImage(sampleDataWithLogo, 'test_banner_with_logo.png');
+// const sampleDataWithLogo = {
+//     kol_name: "Test Partner With Logo",
+//     kol_logo_url: "https://u.cubeupload.com/r0b1n/pfpkol1.jpg",
+//     language: "English",
+//     slogan_text: "WHERE NEW WEALTH IS MADE",
+//     text_direction: "ltr",
+//     official_partner_text: "Official WEEX Partner",
+//     has_logo: true
+// };
+// generateImage(sampleDataWithLogo, 'test_banner_with_logo.png');
 
-const sampleDataWithoutLogo = {
-    kol_name: "Test Partner NO LOGO",
-    kol_logo_url: null,
-    language: "Chinese",
-    slogan_text: "财富自由之路",
-    text_direction: "ltr",
-    official_partner_text: "WEEX官方合作伙伴",
-    has_logo: false
-};
-generateImage(sampleDataWithoutLogo, 'test_banner_no_logo.png');
+// const sampleDataWithoutLogo = {
+//     kol_name: "Test Partner NO LOGO",
+//     kol_logo_url: null,
+//     language: "Chinese",
+//     slogan_text: "财富自由之路",
+//     text_direction: "ltr",
+//     official_partner_text: "WEEX官方合作伙伴",
+//     has_logo: false
+// };
+// generateImage(sampleDataWithoutLogo, 'test_banner_no_logo.png');
 
 
 module.exports = { generateImage };
