@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html dir="{{text_direction}}">
+<head>
+    <meta charset="UTF-8">
+    <title>Yubit Welcome Bonus</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+SC:wght@700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ... body and background-layer remain the same ... */
+
+        .dynamic-header {
+            position: absolute;
+            top: {{header_top_margin}}px;
+            left: {{header_left_margin}}px; 
+            width: calc({{header_max_width}}% - {{header_left_margin}}px); 
+            display: flex;
+            align-items: center;
+            justify-content: {{header_align}}; 
+            gap: calc(72px * var(--scale)); 
+            z-index: 2;
+        }
+
+        .yubit-logo {
+            height: calc(336px * var(--scale)); 
+            object-fit: contain;
+        }
+
+        .separator-icon {
+            height: calc(144px * var(--scale)); 
+            object-fit: contain;
+            opacity: 0.8;
+        }
+
+        .kol-logo {
+            width: calc(288px * var(--scale)); 
+            height: calc(288px * var(--scale));
+            border-radius: 50%;
+            object-fit: cover;
+            border: calc(14px * var(--scale)) solid #A88755;
+            background-color: #000;
+        }
+
+        .kol-name {
+            font-size: calc(240px * var(--scale)); 
+            font-weight: 700;
+            color: #CCCCCA;
+            letter-spacing: 10px;
+            white-space: nowrap;
+            text-shadow: 14px 14px 24px rgba(0, 0, 0, 0.4); 
+        }
+    </style>
+</head>
+<body>
+    
+    <div class="background-layer"></div>
+
+    <div class="dynamic-header">
+        <img src="{{yubit_logo_data_uri}}" class="yubit-logo" alt="YUBIT">
+        <img src="{{cross_logo_data_uri}}" class="separator-icon" alt="x">
+        
+        {{#if has_logo}}
+            <img src="{{kol_logo_url}}" class="kol-logo" alt="KOL">
+        {{/if}}
+        
+        <span class="kol-name">{{kol_name}}</span>
+    </div>
+
+    <script>
+        document.fonts.ready.then(() => {
+            const header = document.querySelector('.dynamic-header');
+            const kolName = document.querySelector('.kol-name');
+            const scale = {{header_scale}}; 
+            
+            if (kolName && header) {
+                let currentFontSize = {{header_base_font_size}} * scale; 
+                const minFontSize = {{header_min_font_size}};
+                
+                kolName.style.fontSize = currentFontSize + 'px';
+                
+                while (header.scrollWidth > header.clientWidth && currentFontSize > minFontSize) {
+                    currentFontSize -= 5;
+                    kolName.style.fontSize = currentFontSize + 'px';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

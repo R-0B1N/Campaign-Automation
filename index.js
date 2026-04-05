@@ -1,204 +1,388 @@
 /*
-* index.js
-* Main automation script to process Lark records and generate banners.
-* Uses lark-api.js to interact with Lark and renderer.js to generate images.
-*/
+ * index.js
+ * Main automation script to process Lark records and generate banners.
+ * Updated for the new 2-format (Sign Up & Twitter) dynamic layout structure.
+ */
 
-const { 
-    getPendingRecords, 
-    // updateRecordStatus, 
-    downloadAttachmentUrlAsBase64 // <-- Import the new function
+const {
+    getPendingRecords,
+    downloadAttachmentUrlAsBase64,
+    uploadAttachment,
+    batchUpdateRecord
 } = require('./lark-api.js');
+
 const { generateImage } = require('./renderer.js');
-const path = require('path'); // <-- NEW: Import path module
+const path = require('path');
+const fs = require('fs');
+const DEFAULT_LP_PROFILE_KV = path.join(__dirname, 'image-template', 'backgrounds', '福利中心KV.png');
 
-// --- Language Slogan Mapping ---
-const slogans = {
-    'English': { text: 'WHERE NEW WEALTH IS MADE', dir: 'ltr' },
-    'Chinese': { text: '财富自由之路', dir: 'ltr' }, // Simplified Chinese
-    'Chinese—TW': { text: '財富自由之路', dir: 'ltr' }, // Or whatever the Lark value is
-    'Korean': { text: '부의 미래가 시작되는 곳', dir: 'ltr' },
-    'Japanese': { text: '新たな豊かさが生み出される場所', dir: 'ltr' },
-    'Persian': { text: 'راهی برای دستیابی به آزادی مالی', dir: 'rtl' }, // FA_IR
-    'Turkish': { text: 'SERMAYENİN SERVETE DÖNÜŞTÜĞÜ YER', dir: 'ltr' }, // TR
-    'Deutsch': { text: 'WO NEUES VERMÖGEN ENTSTEHT', dir: 'ltr' }, // DE
-    'French': { text: 'OÙ LA NOUVELLE RICHESSE SE CRÉE', dir: 'ltr' }, // FR
-    'Italian': { text: 'DOVE SI CREA NUOVA RICCHEZZA', dir: 'ltr' }, // IT
-    'Spanish (Spain)': { text: 'DÓNDE SE CREA LA NUEVA RIQUEZA', dir: 'ltr' }, // ES_ES
-    'Polish': { text: 'Nowy wymiar budowania majątku', dir: 'ltr' }, // PL
-    'Russian': { text: 'Здесь создается новый капитал', dir: 'ltr' }, // RU
-    'Ukrainian': { text: 'ДЕ СТВОРЮЄТЬСЯ НОВЕ БАГАТСТВО', dir: 'ltr' }, // UK
-    'Arabic Language': { text: 'بوابتك إلى ثروة جديدة', dir: 'rtl' }, // AR
-    'Portuguese': { text: 'ONDE A NOVA RIQUEZA É CRIADA', dir: 'ltr' }, // PT_BR
-    'Vietnamese': { text: 'NƠI BẮT ĐẦU HÀNH TRÌNH THỊNH VƯỢNG', dir: 'ltr' }, // VI
-    'Spanish (Latin America)': { text: 'DONDE SE GENERA LA NUEVA RIQUEZA', dir: 'ltr' } // ES_419
-    // Add other languages as needed
+
+// --- MASTER TOGGLES ---
+const UPLOAD_TO_LARK = true;
+const GENERATE_SIGNUP = false;   // Set to false to skip Sign Up pages
+const GENERATE_TWITTER = true;   // Set to false to skip Twitter posts
+const GENERATE_NAMECARD = true;  // Set to false to override Lark and skip all Namecards
+const GENERATE_LP_PROFILE = true;
+
+// --- 1. FORMAT CONFIGURATION ---
+// Define dimensions and top padding for the centered Flexbox header
+// --- 1. FORMAT CONFIGURATION ---
+const formats = {
+    'SignUp': { 
+        width: 3900, 
+        height: 5364, 
+        layout: { top: 100, left: 0, align: 'center', maxW: 100 } // Center aligned
+    }, 
+    'Twitter': { 
+        width: 3366, 
+        height: 4362, 
+        layout: { top: 80, left: 0, align: 'center', maxW: 100 } // FIXED: Back to center aligned
+    }   
 };
-const defaultSlogan = slogans['English'];
 
-// --- NEW: Official Partner Text Mapping ---
-const officialPartnerTexts = {
-    'English': 'Official WEEX Partner',
-    'Chinese': 'WEEX官方合作伙伴', // Simplified
-    'Chinese—TW': 'WEEX官方合作夥伴',
-    'Korean': '공식 WEEX 파트너',
-    'Japanese': 'WEEX公式パートナー',
-    'Persian': 'شریک رسمی WEEX', // Right-to-left
-    'Turkish': 'Resmî WEEX Ortağı',
-    'Deutsch': 'Offizieller WEEX-Partner',
-    'French': 'Partenaire officiel de WEEX',
-    'Italian': 'Partner ufficiale WEEX',
-    'Spanish (Spain)': 'Socio oficial de WEEX',
-    'Polish': 'Ofiy partner WEEX',
-    'Russian': 'Официальный партнер WEEX',
-    'Portuguese': "Parceiro Oficial da WEEX",
-    'Vietnamese': "Đối tác chính thức của WEEX",
-    'Spanish (Latin Americe)': 'Socio oficial de WEEX'
-     // Add others as needed
+// --- 2. CAMPAIGN BACKGROUND MAPPING ---
+// Make sure these exact filenames exist in your "image-template/backgrounds" folder!
+const backgrounds = {
+    '20% Deposit Bonus': {
+        'SignUp': 'Sign Up Page-20% Deposit.png', 
+        // 'Twitter': 'Twitter-20% Deposit.png',
+        'Twitter': { 
+            bg: 'new 20% deposit.png',
+            width: 2272, 
+            height: 2908, 
+            layout: { top: 50, left: 0, align: 'center', scale: 1.05} 
+        },
+          
+    },
+    'Deposit and Trade': {
+        'SignUp': 'Sign Up Page-Deposit and Trade.png',
+        'Twitter': 'Twitter-Deposit and Trade.png',
+    },
+    '20,000 Welcome Bonus': {
+        'SignUp': { 
+            bg: 'Sign Up Page-20,000 Welcome Bonus.png',
+            width: 3540, 
+            height: 4104, 
+            layout: { top: 200, left: 0, align: 'center', maxW: 100 } 
+        },
+        'Twitter': { 
+            bg: 'Twitter-20,000 Welcome Bonus.png',
+            width: 4800, 
+            height: 2700, 
+            layout: { top: 220, left: 180, align: 'flex-start', maxW: 65 } 
+        }
+    },
+    '100% Deposit Bonus (Package A)': {
+        'Twitter': { 
+            bg: 'Twitter-100% Deposit Bonus (Package A) Template.png',
+            width: 4800, 
+            height: 2700, 
+            layout: { 
+                top: 230, 
+                left: 1450, 
+                align: 'flex-start', 
+                maxW: 65, 
+                scale: 0.9, 
+                uppercase: true,
+                baseFontSize: 150,
+                minFontSize: 90   
+            },
+            template: 'poster-template-nologo.html',
+        }
+    },
+    '50% Deposit Bonus (Package C)': {
+        'Twitter': { 
+            bg: 'Twitter-50% Deposit Bonus (Package C) Template.png',
+            width: 4800, 
+            height: 2700, 
+            layout: { 
+                top: 230, 
+                left: 1450, 
+                align: 'flex-start', 
+                maxW: 65, 
+                scale: 0.9, 
+                uppercase: true,
+                baseFontSize: 150,
+                minFontSize: 90   
+            },
+            template: 'poster-template-nologo.html'
+        }
+    }
 };
-const defaultPartnerText = officialPartnerTexts['English'];
-
 
 /**
- * Maps Lark column names to template keys, handles language and missing logos.
- * * ⚠️ ACTION REQUIRED: Verify ALL field names from your Lark sheet!
- *
- * *** UPDATED: This function is now async ***
+ * Processes a single record from Lark to extract and prepare data.
  */
 async function processRecord(record) {
     const fields = record.fields;
 
-    // --- ⚠️ Verify field names! ---
-    const kolName = fields['Name of KOL（Posters and materials used）'];
-    const kolLogoAttachmentArray = fields['Has Profile picture or not']; // This is an ARRAY
-    const language = fields['Target language'];
-    const ticketId = fields['自动编号']; // <-- NEW: For folder path
-    const kolUid = fields['UID of KOL']; // <-- NEW: For folder path
-    const activityRecord = fields['活动记录']; // <-- NEW: For folder path
-    // --- End Verify ---
+    const kolName = fields.kol_name;
+    const kolLogoUrl = fields.kol_logo_url;
+    const hasLogo = fields.has_logo;
+    const ticketId = fields.ticket_id;
+    const kolUid = fields.kol_uid;
+    const activityRecord = fields.activity_record; 
+    const recordId = fields.record_id;
 
-    // --- Basic validation ---
-    if (!kolName || !ticketId || !kolUid || !activityRecord) {
-        console.warn(`Skipping record ${ticketId}: Missing required fields (KOL Name, Ticket ID, UID, or Activity Record).`);
+    if (!kolName || !ticketId || !activityRecord) {
+        console.warn(`Skipping record ${recordId}: Missing KOL Name, Ticket ID, or Event Type.`);
         return null;
     }
-     if (!language) {
-        console.warn(`Skipping record ${ticketId}: Missing Target language.`);
-        return null; // Skip if no language is specified
-    }
 
-    // --- *** UPDATED: Determine Logo URL (Handle missing/invalid) *** ---
-    let kolLogoUrl = null; // Default to null (triggers no-logo template)
-    
-    if (Array.isArray(kolLogoAttachmentArray) && kolLogoAttachmentArray.length > 0) {
-        const firstAttachment = kolLogoAttachmentArray[0];
-        
-        // We need the FULL URL, which contains the 'extra' param for bitable attachments
-        if (firstAttachment && firstAttachment.url) {
-            try {
-                console.log(`Downloading image for record ${ticketId} (url: ${firstAttachment.url})...`);
-                // Call our new function with the full URL
-                kolLogoUrl = await downloadAttachmentUrlAsBase64(firstAttachment.url); // <--- USE NEW FUNCTION
-                console.log(`Successfully downloaded image for record ${ticketId}.`);
-            } catch (error) {
-                // Log the error but continue, will just use the no-logo template
-                console.error(`Failed to download image for record ${ticketId}: ${error.message}`);
-                kolLogoUrl = null; // Ensure it's null on failure
-            }
-        } else {
-            console.log(`Record ${ticketId}: Attachment found, but it has no 'url' property.`, firstAttachment);
+    let downloadedLogoDataUri = null;
+    if (hasLogo && kolLogoUrl) {
+        try {
+            console.log(`Downloading image for record ${ticketId}...`);
+            downloadedLogoDataUri = await downloadAttachmentUrlAsBase64(kolLogoUrl);
+        } catch (error) {
+            console.error(`Failed to download image for record ${ticketId}: ${error.message}`);
         }
-    } else {
-        // This will catch records where the attachment cell is empty
-        console.log(`Record ${ticketId}: No attachment found in 'Has Profile picture or not'. Using no-logo template.`);
-    }
-    // --- *** END NEW LOGIC ---
-
-
-    // --- Get Localized Texts ---
-    const sloganInfo = slogans[language] || defaultSlogan;
-    const partnerText = officialPartnerTexts[language] || defaultPartnerText;
-
-    if (!slogans[language]) {
-         console.warn(`Warning for record ${ticketId}: Slogan language '${language}' not found. Using default.`);
-    }
-     if (!officialPartnerTexts[language]) {
-         console.warn(`Warning for record ${ticketId}: Partner text language '${language}' not found. Using default.`);
     }
 
     return {
+        ticket_id: ticketId,
+        kol_uid: kolUid,
         kol_name: kolName,
-        kol_logo_url: kolLogoUrl, // Will be the Base64 Data URI or null
-        language: language,
-        slogan_text: sloganInfo.text,
-        text_direction: sloganInfo.dir,
-        official_partner_text: partnerText, // NEW
-        record_id: ticketId,
-        ticket_id: ticketId, // <-- NEW: Pass to main
-        kol_uid: kolUid, // <-- NEW: Pass to main
-        activity_record: activityRecord // <-- NEW: Pass to main
+        activity_record: activityRecord,
+        record_id: recordId,
+        posterData: {
+            kol_name: kolName,
+            kol_logo_url: downloadedLogoDataUri,
+            has_logo: !!downloadedLogoDataUri
+        },
+        should_generate_namecard: (fields.should_generate_namecard === 'Yes'), 
     };
 }
 
-
 async function main() {
     console.log("Starting banner automation process...");
-    
-    const records = await getPendingRecords();
-    
-    if (records.length === 0) {
+
+    let records;
+    try {
+        records = await getPendingRecords();
+    } catch (error) {
+        console.error("❌ CRITICAL: Failed to get records from Lark.", error.message);
+        return;
+    }
+
+    if (!records || records.length === 0) {
         console.log("No pending records found. All done!");
         return;
     }
 
-    // Process records one by one (sequentially)
-    // This is safer for API rate limits and easier to log
     for (const record of records) {
-        console.log(`--- Processing record ${ticketId} ---`);
-        
-        // *** ADDED await here ***
-        const data = await processRecord(record);
+        const ticketId = record.fields.ticket_id || record.record_id;
+        console.log(`\n--- Processing record ${ticketId} ---`);
+
+        let data;
+        try {
+            data = await processRecord(record);
+        } catch (error) {
+            console.error(`❌ Failed to process record ${ticketId}:`, error.message);
+            continue;
+        }
 
         if (data) {
-            // --- UPDATED File Path Logic ---
-            const hasLogo = data.kol_logo_url ? 'logo' : 'no-logo';
-
-            // Simple function to sanitize strings for file/folder names
-            const sanitize = (str) => {
-                if (typeof str !== 'string' && typeof str !== 'number') {
-                    return '_unknown_';
-                }
-                // Replace problematic characters with an underscore
-                return String(str).replace(/[^a-zA-Z0-9_.-]/g, '_').replace(/_+/g, '_');
+            const eventType = data.activity_record.trim();
+            const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
+            const folderPath = path.join(__dirname, 'banners', `${data.ticket_id}-${saneKolName}`);
+            
+            if (!backgrounds[eventType]) {
+                console.warn(`⚠️ Warning: Unknown Event Type '${eventType}' for ${data.kol_name}. Skipping image generation.`);
+                continue;
             }
-            
-            // Sanitize all parts
-            const ticketId = sanitize(data.ticket_id);
-            const kolUid = sanitize(data.kol_uid);
-            const kolName = sanitize(data.kol_name);
-            const activityRecord = sanitize(data.activity_record);
-            const language = sanitize(data.language);
 
-            // Create the folder path structure: [TicketID]-[UID]-[KOLName]-[ActivityRecord]
-            const folderPath = `${ticketId}-${kolUid}-${kolName}-${activityRecord}`;
-            
-            // Create the final file name
-            const fileName = `${kolName}_${language}_${hasLogo}_namecard.png`;
-            
-            // Combine them for the renderer. 
-            // renderer.js automatically joins this with the 'banners' directory.
-            const relativeOutputPath = path.join(folderPath, fileName);
-            
-            console.log(`Generating banner at: /banners/${relativeOutputPath}`);
-            
-            await generateImage(data, relativeOutputPath); //
-            
-            // await updateRecordStatus(data.record_id);
+            let tokens = {
+                signUpToken: null,
+                twitterToken: null,
+                namecardToken: null,
+                lpProfileToken: null // Initialize new token
+            };
+
+            let allUploadsSucceeded = true;
+
+            // --- 3. GENERATE AND UPLOAD NAMECARD ---
+            if (GENERATE_NAMECARD && data.should_generate_namecard) {
+                console.log(`[Namecard] Requirement detected. Generating namecard for ${data.kol_name}...`);
+                
+                const namecardBgFile = 'YUBIT Namecard.png'; 
+                const namecardFilename = `${saneKolName}_Namecard.png`;
+
+                try {
+                    const namecardFilePath = await generateImage(
+                        data.posterData,
+                        path.join(`${data.ticket_id}-${saneKolName}`, namecardFilename),
+                        namecardBgFile,
+                        4800,  
+                        2700,  
+                        { top: 0, left: 0, align: 'center', maxW: 100 }, 
+                        'namecard-template.html' 
+                    );
+
+                    if (UPLOAD_TO_LARK) {
+                        console.log(`Uploading Namecard...`);
+                        tokens.namecardToken = await uploadAttachment(namecardFilePath);
+                    }
+                } catch (error) {
+                    console.error(`❌ Failed on Namecard for ${data.kol_name}:`, error.message);
+                    allUploadsSucceeded = false;
+                }
+            }
+
+            // --- 3B. GENERATE AND UPLOAD BOTH POSTER FORMATS ---
+            for (const formatName in formats) {
+                if (formatName === 'SignUp' && !GENERATE_SIGNUP) continue;
+                if (formatName === 'Twitter' && !GENERATE_TWITTER) continue;
+
+                const globalConfig = formats[formatName];
+                const eventConfig = backgrounds[eventType][formatName];
+
+                // Safety check for missing formats
+                if (!eventConfig) {
+                    console.log(`[Skip] No ${formatName} layout configured for event: ${eventType}.`);
+                    continue;
+                }
+
+                const outputFilename = `${saneKolName}_${eventType.replace(/\s+/g, '')}_${formatName}.png`;
+                
+                let bgFileName, width, height, layout, templateFile;
+
+                // Dynamically route old format vs new format
+                if (typeof eventConfig === 'string') {
+                    bgFileName = eventConfig;
+                    width = globalConfig.width;
+                    height = globalConfig.height;
+                    layout = globalConfig.layout; 
+                    templateFile = 'poster-template.html';
+                } else {
+                    bgFileName = eventConfig.bg;
+                    width = eventConfig.width;
+                    height = eventConfig.height;
+                    layout = eventConfig.layout;
+                    templateFile = eventConfig.template || 'poster-template.html'; 
+                }
+
+                // Intercept and uppercase the KOL name if the layout flag is set
+                const formatPosterData = { ...data.posterData };
+                if (layout && layout.uppercase) {
+                    formatPosterData.kol_name = String(formatPosterData.kol_name).toUpperCase();
+                }
+
+                try {
+                    const generatedFilePath = await generateImage(
+                        formatPosterData,
+                        path.join(`${data.ticket_id}-${saneKolName}`, outputFilename),
+                        bgFileName,
+                        width,
+                        height,
+                        layout,
+                        templateFile
+                    );
+                    
+                    if (UPLOAD_TO_LARK) {
+                        console.log(`Uploading ${formatName} poster...`);
+                        const token = await uploadAttachment(generatedFilePath);
+                        
+                        if (formatName === 'SignUp') tokens.signUpToken = token;
+                        if (formatName === 'Twitter') tokens.twitterToken = token;
+                    }
+                } catch (error) {
+                    console.error(`❌ Failed on ${formatName} poster for ${data.kol_name}:`, error.message);
+                    allUploadsSucceeded = false;
+                }
+            }
+
+            // --- 3C. GENERATE AND UPLOAD LANDING PAGE PROFILE ---
+            if (GENERATE_LP_PROFILE) {
+                console.log(`[LP Profile] Handling for ${data.kol_name}...`);
+                
+                const lpProfileBgFile = 'Landing Page KOL Profile Template.png'; 
+                const lpProfileFilename = `${saneKolName}_LP_Profile.png`;
+
+                let processedProfilePicDataUri = null; // Data to pass to template
+                let profilePicHasLogo = false; // Flag for template logic
+
+                if (data.posterData.has_logo) {
+                    console.log(`[LP Profile] Using provided KOL portrait.`);
+                    processedProfilePicDataUri = data.posterData.kol_logo_url;
+                    profilePicHasLogo = true;
+                } else {
+                    console.log(`[LP Profile] Using default 福利中心KV for missing portrait.`);
+                    // Convert the default local file to data URI
+                    try {
+                        const bitmap = fs.readFileSync(DEFAULT_LP_PROFILE_KV);
+                        // Determine mime type based on file extension
+                        const ext = path.extname(DEFAULT_LP_PROFILE_KV).toLowerCase();
+                        let mime = 'image/jpeg';
+                        if (ext === '.png') mime = 'image/png';
+                        else if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
+                        // ... you could add other extensions ...
+
+                        processedProfilePicDataUri = `data:${mime};base64,${bitmap.toString('base64')}`;
+                        profilePicHasLogo = true; // Still treat as 'having' an image for mask/circle logic
+                    } catch (error) {
+                        console.error(`❌ Failed to read or convert default KV file:`, error.message);
+                        // Handle error (maybe fallback to simple '?' placeholder in HTML if needed,
+                        // but setting to null and false will skip logic)
+                    }
+                }
+
+                if (processedProfilePicDataUri) {
+                    // Prepare data for generateImage, updating the logo/pic URI
+                    const lpProfilePosterData = {
+                        ...data.posterData,
+                        kol_logo_url: processedProfilePicDataUri,
+                        has_logo: profilePicHasLogo
+                    };
+
+                    try {
+                        const lpProfileFilePath = await generateImage(
+                            lpProfilePosterData, 
+                            path.join(`${data.ticket_id}-${saneKolName}`, lpProfileFilename),
+                            lpProfileBgFile,
+                            1040, 
+                            680,  
+                            { top: 0, left: 0, align: 'center', maxW: 100 }, 
+                            'lp-profile-template.html' // Assumed template name from previous examples
+                        );
+
+                        if (UPLOAD_TO_LARK) {
+                            console.log(`Uploading LP Profile...`);
+                            tokens.lpProfileToken = await uploadAttachment(lpProfileFilePath);
+                        }
+                    } catch (error) {
+                        console.error(`❌ Failed on LP Profile for ${data.kol_name}:`, error.message);
+                        allUploadsSucceeded = false;
+                    }
+                } else {
+                     console.log(`[Skip] LP Profile skipped for ${data.kol_name}: No profile data and default fallback failed.`);
+                }
+            }
+        
+            // --- 4. UPDATE LARK RECORD ---
+            if (allUploadsSucceeded && UPLOAD_TO_LARK) {
+                try {
+                    console.log(`Batch updating Lark record ${data.record_id}...`);
+                    // Call the updated lark-api function with 4 token arguments
+                    await batchUpdateRecord(data.record_id, {
+                        signUpToken: tokens.signUpToken,
+                        twitterToken: tokens.twitterToken,
+                        namecardToken: tokens.namecardToken,
+                        lpProfileToken: tokens.lpProfileToken // Added new token
+                    });
+                    console.log(`✅ Successfully finalized record ${data.record_id}.`);
+                } catch (updateError) {
+                    console.error(`❌ Failed to update record ${data.record_id}:`, updateError.message);
+                }
+            } else if (!UPLOAD_TO_LARK) {
+                console.log(`[UPLOAD DISABLED] Generation complete for ${data.kol_name}.`);
+            } else {
+                console.warn(`⚠️ Skipping Lark update for ${data.kol_name} due to upload failures.`);
+            }
         }
-        console.log(`--- Finished record ${ticketId} ---`);
     }
-    
-    console.log("Automation process complete.");
+
+    console.log("\n🎉 Automation process complete.");
 }
 
 main().catch(error => {

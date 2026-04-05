@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Landing Page Profile</title>
+    <style>
+        body {
+            width: 1040px;
+            height: 680px;
+            margin: 0;
+            padding: 0;
+            position: relative;
+            background-color: #000;
+            overflow: hidden;
+        }
+
+        .background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('{{{bg_image_data_uri}}}'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            z-index: 1;
+        }
+
+        /* The circular mask that perfectly fits inside the gold ring */
+        .profile-mask {
+            position: absolute;
+            
+            /* --- TWEAK THESE VALUES IF IT DOESN'T PERFECTLY ALIGN --- */
+            width: 370px;    /* The diameter of the inner ring */
+            height: 370px;
+            left: 328px;     /* Horizontal position (1040 - 418) / 2 centers it exactly */
+            top: 56px;       /* Vertical position from the top */
+            /* -------------------------------------------------------- */
+
+            border-radius: 50%;
+            overflow: hidden; /* This crops the square image into a circle */
+            z-index: 2;
+            background-color: #111; /* Fallback color */
+        }
+
+        .kol-logo {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Ensures the image fills the circle without stretching */
+        }
+    </style>
+</head>
+<body>
+    <div class="background-layer"></div>
+
+    {{#if has_logo}}
+        <div class="profile-mask">
+            <img src="{{kol_logo_url}}" class="kol-logo" alt="KOL">
+        </div>
+    {{/if}}
+</body>
+</html>
