@@ -43,71 +43,79 @@ const formats = {
 // --- 2. CAMPAIGN BACKGROUND MAPPING ---
 // Make sure these exact filenames exist in your "image-template/backgrounds" folder!
 const backgrounds = {
-    '20% Deposit Bonus': {
-        'SignUp': 'Sign Up Page-20% Deposit.png', 
-        // 'Twitter': 'Twitter-20% Deposit.png',
-        'Twitter': { 
-            bg: 'new 20% deposit.png',
-            width: 2272, 
-            height: 2908, 
-            layout: { top: 50, left: 0, align: 'center', scale: 1.05} 
-        },
-          
+  "20% Deposit Bonus": {
+    SignUp: "Sign Up Page-20% Deposit.png",
+    // 'Twitter': 'Twitter-20% Deposit.png',
+    Twitter: {
+      bg: "new 20% deposit.png",
+      width: 2272,
+      height: 2908,
+      layout: { top: 50, left: 0, align: "center", scale: 1.05 },
     },
-    'Deposit and Trade': {
-        'SignUp': 'Sign Up Page-Deposit and Trade.png',
-        'Twitter': 'Twitter-Deposit and Trade.png',
+  },
+  "Deposit and Trade": {
+    SignUp: "Sign Up Page-Deposit and Trade.png",
+    Twitter: "Twitter-Deposit and Trade.png",
+  },
+  "20,000 Welcome Bonus": {
+    SignUp: {
+      bg: "Sign Up Page-20,000 Welcome Bonus.png",
+      width: 3540,
+      height: 4104,
+      layout: { top: 200, left: 0, align: "center", maxW: 100 },
     },
-    '20,000 Welcome Bonus': {
-        'SignUp': { 
-            bg: 'Sign Up Page-20,000 Welcome Bonus.png',
-            width: 3540, 
-            height: 4104, 
-            layout: { top: 200, left: 0, align: 'center', maxW: 100 } 
-        },
-        'Twitter': { 
-            bg: 'Twitter-20,000 Welcome Bonus.png',
-            width: 4800, 
-            height: 2700, 
-            layout: { top: 220, left: 180, align: 'flex-start', maxW: 65 } 
-        }
+    Twitter: {
+      bg: "Twitter-20,000 Welcome Bonus.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 220,
+        left: 180,
+        align: "flex-start",
+        maxW: 300,
+        scale: 0.9,
+        uppercase: true,
+        baseFontSize: 200,
+        minFontSize: 180,
+      },
     },
-    '100% Deposit Bonus (Package A)': {
-        'Twitter': { 
-            bg: 'Twitter-100% Deposit Bonus (Package A) Template.png',
-            width: 4800, 
-            height: 2700, 
-            layout: { 
-                top: 230, 
-                left: 1450, 
-                align: 'flex-start', 
-                maxW: 65, 
-                scale: 0.9, 
-                uppercase: true,
-                baseFontSize: 150,
-                minFontSize: 90   
-            },
-            template: 'poster-template-nologo.html',
-        }
+  },
+  "100% Deposit Bonus (Package A)": {
+    Twitter: {
+      bg: "Twitter-100% Deposit Bonus (Package A) Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 230,
+        left: 1450,
+        align: "flex-start",
+        maxW: 65,
+        scale: 0.9,
+        uppercase: true,
+        baseFontSize: 150,
+        minFontSize: 90,
+      },
+      template: "poster-template-nologo.html",
     },
-    '50% Deposit Bonus (Package C)': {
-        'Twitter': { 
-            bg: 'Twitter-50% Deposit Bonus (Package C) Template.png',
-            width: 4800, 
-            height: 2700, 
-            layout: { 
-                top: 230, 
-                left: 1450, 
-                align: 'flex-start', 
-                maxW: 65, 
-                scale: 0.9, 
-                uppercase: true,
-                baseFontSize: 150,
-                minFontSize: 90   
-            },
-            template: 'poster-template-nologo.html'
-        }
-    }
+  },
+  "50% Deposit Bonus (Package C)": {
+    Twitter: {
+      bg: "Twitter-50% Deposit Bonus (Package C) Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 230,
+        left: 1450,
+        align: "flex-start",
+        maxW: 65,
+        scale: 0.9,
+        uppercase: true,
+        baseFontSize: 150,
+        minFontSize: 90,
+      },
+      template: "poster-template-nologo.html",
+    },
+  },
 };
 
 /**
@@ -295,59 +303,25 @@ async function main() {
             // --- 3C. GENERATE AND UPLOAD LANDING PAGE PROFILE ---
             if (GENERATE_LP_PROFILE) {
                 console.log(`[LP Profile] Handling for ${data.kol_name}...`);
-                
-                const lpProfileBgFile = 'Landing Page KOL Profile Template.png'; 
-                const lpProfileFilename = `${saneKolName}_LP_Profile.png`;
-
-                let processedProfilePicDataUri = null; // Data to pass to template
-                let profilePicHasLogo = false; // Flag for template logic
 
                 if (data.posterData.has_logo) {
-                    console.log(`[LP Profile] Using provided KOL portrait.`);
-                    processedProfilePicDataUri = data.posterData.kol_logo_url;
-                    profilePicHasLogo = true;
-                } else {
-                    console.log(`[LP Profile] Using default 福利中心KV for missing portrait.`);
-                    // Convert the default local file to data URI
-                    try {
-                        const bitmap = fs.readFileSync(DEFAULT_LP_PROFILE_KV);
-                        // Determine mime type based on file extension
-                        const ext = path.extname(DEFAULT_LP_PROFILE_KV).toLowerCase();
-                        let mime = 'image/jpeg';
-                        if (ext === '.png') mime = 'image/png';
-                        else if (ext === '.jpg' || ext === '.jpeg') mime = 'image/jpeg';
-                        // ... you could add other extensions ...
-
-                        processedProfilePicDataUri = `data:${mime};base64,${bitmap.toString('base64')}`;
-                        profilePicHasLogo = true; // Still treat as 'having' an image for mask/circle logic
-                    } catch (error) {
-                        console.error(`❌ Failed to read or convert default KV file:`, error.message);
-                        // Handle error (maybe fallback to simple '?' placeholder in HTML if needed,
-                        // but setting to null and false will skip logic)
-                    }
-                }
-
-                if (processedProfilePicDataUri) {
-                    // Prepare data for generateImage, updating the logo/pic URI
-                    const lpProfilePosterData = {
-                        ...data.posterData,
-                        kol_logo_url: processedProfilePicDataUri,
-                        has_logo: profilePicHasLogo
-                    };
+                    console.log(`[LP Profile] Using provided KOL portrait. Generating custom image...`);
+                    const lpProfileBgFile = 'Landing Page KOL Profile Template.png'; 
+                    const lpProfileFilename = `${saneKolName}_LP_Profile.png`;
 
                     try {
                         const lpProfileFilePath = await generateImage(
-                            lpProfilePosterData, 
+                            data.posterData, 
                             path.join(`${data.ticket_id}-${saneKolName}`, lpProfileFilename),
                             lpProfileBgFile,
                             1040, 
                             680,  
                             { top: 0, left: 0, align: 'center', maxW: 100 }, 
-                            'lp-profile-template.html' // Assumed template name from previous examples
+                            'lp-profile-template.html' 
                         );
 
                         if (UPLOAD_TO_LARK) {
-                            console.log(`Uploading LP Profile...`);
+                            console.log(`Uploading Generated LP Profile...`);
                             tokens.lpProfileToken = await uploadAttachment(lpProfileFilePath);
                         }
                     } catch (error) {
@@ -355,7 +329,17 @@ async function main() {
                         allUploadsSucceeded = false;
                     }
                 } else {
-                     console.log(`[Skip] LP Profile skipped for ${data.kol_name}: No profile data and default fallback failed.`);
+                    console.log(`[LP Profile] No portrait found. Uploading raw default 福利中心KV...`);
+                    
+                    if (UPLOAD_TO_LARK) {
+                        try {
+                            // Uploads the raw file directly to Lark without passing it through puppeteer
+                            tokens.lpProfileToken = await uploadAttachment(DEFAULT_LP_PROFILE_KV);
+                        } catch (error) {
+                            console.error(`❌ Failed to upload default KV for ${data.kol_name}:`, error.message);
+                            allUploadsSucceeded = false;
+                        }
+                    }
                 }
             }
         

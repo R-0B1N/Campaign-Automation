@@ -123,7 +123,7 @@ async function getPendingRecords() {
                     }
                     
                     hasLogo = true;
-                    console.log(`✅ Found logo token/URL for record ${record.record_id}. URL: ${logoUrl}`);
+                    // console.log(`✅ Found logo token/URL for record ${record.record_id}. URL: ${logoUrl}`);
                 } else {
                     console.warn(`⚠️ No valid image token found for ${record.record_id}.`);
                 }

@@ -35,8 +35,6 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
 
         const finalHtml = template({
             ...templateData,
-            background_file_url: bgImageDataUri,
-            background_image_url: bgImageDataUri,
             bg_image_data_uri: bgImageDataUri,
             yubit_logo_data_uri: yubitDataUri,   
             cross_logo_data_uri: crossDataUri,   
