@@ -50,12 +50,22 @@ const backgrounds = {
       bg: "new 20% deposit.png",
       width: 2272,
       height: 2908,
-      layout: { top: 50, left: 0, align: "center", scale: 1.05 },
+      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
     },
   },
   "Deposit and Trade": {
-    SignUp: "Sign Up Page-Deposit and Trade.png",
-    Twitter: "Twitter-Deposit and Trade.png",
+    SignUp: {
+      bg: "Sign Up Page-Deposit and Trade.png",
+      width: 2272,
+      height: 2908,
+      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
+    },
+    Twitter: {
+      bg: "Twitter-Deposit and Trade.png",
+      width: 2272,
+      height: 2908,
+      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
+    },
   },
   "20,000 Welcome Bonus": {
     SignUp: {
@@ -104,7 +114,7 @@ const backgrounds = {
       width: 4800,
       height: 2700,
       layout: {
-        top: 230,
+        top: 220,
         left: 1450,
         align: "flex-start",
         maxW: 65,
