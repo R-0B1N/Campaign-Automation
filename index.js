@@ -22,7 +22,7 @@ const UPLOAD_TO_LARK = true;
 const GENERATE_SIGNUP = true;   // Set to false to skip Sign Up pages
 const GENERATE_TWITTER = true;   // Set to false to skip Twitter posts
 const GENERATE_NAMECARD = true;  // Set to false to override Lark and skip all Namecards
-const GENERATE_LP_PROFILE = false;
+const GENERATE_LP_PROFILE = true;
 
 // --- 1. FORMAT CONFIGURATION ---
 // Define dimensions and top padding for the centered Flexbox header
@@ -177,6 +177,57 @@ const backgrounds = {
       template: "poster-template-vip.html", // Routes to the new HTML file below
     },
   },
+  "Package B 2.0": {
+    Twitter: {
+      bg: "Twitter-20% Deposit Bonus (Package B) Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 171,       
+        left: 1437,     
+        align: "flex-start",
+        maxW: 65,       
+        scale: 1.125,   
+        uppercase: true,
+        baseFontSize: 115, 
+        minFontSize: 60,
+      },
+      template: "poster-template-nologo.html",
+    },
+  },
+  "Package B 2.0 (VIP)": {
+    SignUp: {
+      bg: "Sign Up Page- Package B 2.0 VIP Template.png",
+      width: 3408, 
+      height: 4080, 
+      layout: { 
+        top: -9999, left: 0, align: "center", maxW: 100, 
+        vipTop: 1035,   
+        vipLeft: 117,   
+        vipFontSize: 135 
+      }, 
+      template: "poster-template-vip.html" 
+    },
+    Twitter: {
+      bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 192,       
+        left: 1437,     
+        align: "flex-start",
+        maxW: 65,       
+        scale: 1.125,   
+        uppercase: true,
+        baseFontSize: 115, 
+        minFontSize: 60,
+        vipTop: 2235,   
+        vipLeft: 186,   
+        vipFontSize: 141 
+      },
+      template: "poster-template-vip.html", 
+    },
+  },
 };
 
 /**
@@ -292,11 +343,12 @@ async function main() {
 
             let allUploadsSucceeded = true;
 
-            // --- 3. GENERATE AND UPLOAD NAMECARD ---
+           // --- 3. GENERATE AND UPLOAD NAMECARD ---
             if (GENERATE_NAMECARD && data.should_generate_namecard) {
                 console.log(`[Namecard] Requirement detected. Generating namecard for ${data.kol_name}...`);
                 
-                const namecardBgFile = 'YUBIT Namecard.png'; 
+                // NEW: Ensure this exactly matches the file in your image-template/backgrounds folder
+                const namecardBgFile = 'Namecard Template.png'; 
                 const namecardFilename = `${saneKolName}_Namecard.png`;
 
                 try {
@@ -304,8 +356,8 @@ async function main() {
                         data.posterData,
                         path.join(`${data.ticket_id}-${saneKolName}`, namecardFilename),
                         namecardBgFile,
-                        4800,  
-                        2700,  
+                        3200,  // NEW WIDTH
+                        1800,  // NEW HEIGHT
                         { top: 0, left: 0, align: 'center', maxW: 100 }, 
                         'namecard-template.html' 
                     );
