@@ -19,10 +19,10 @@ const DEFAULT_LP_PROFILE_KV = path.join(__dirname, 'image-template', 'background
 
 // --- MASTER TOGGLES ---
 const UPLOAD_TO_LARK = true;
-const GENERATE_SIGNUP = false;   // Set to false to skip Sign Up pages
+const GENERATE_SIGNUP = true;   // Set to false to skip Sign Up pages
 const GENERATE_TWITTER = true;   // Set to false to skip Twitter posts
 const GENERATE_NAMECARD = true;  // Set to false to override Lark and skip all Namecards
-const GENERATE_LP_PROFILE = true;
+const GENERATE_LP_PROFILE = false;
 
 // --- 1. FORMAT CONFIGURATION ---
 // Define dimensions and top padding for the centered Flexbox header
@@ -126,6 +126,57 @@ const backgrounds = {
       template: "poster-template-nologo.html",
     },
   },
+  "Package A 2.0": {
+    Twitter: {
+      bg: "Twitter-100% Deposit Bonus (Package A 2.0) Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 171,       
+        left: 1437,     
+        align: "flex-start",
+        maxW: 65,       
+        scale: 1.125,   // Scales base 288px logo to 324px
+        uppercase: true,
+        baseFontSize: 115, // 115 * 1.125 scale = ~129px target font size
+        minFontSize: 60,
+      },
+      template: "poster-template-nologo.html",
+    },
+  },
+  "Package A 2.0 (VIP)": {
+    SignUp: {
+      bg: "Sign Up Page-100% Deposit Bonus (Package A 2.0) VIP Template.png",
+      width: 3408, 
+      height: 4080, 
+      layout: { 
+        top: -9999, left: 0, align: "center", maxW: 100, // Pushes KOL header off-screen
+        vipTop: 1035,    // Scaled 3x from CSS 345px
+        vipLeft: 117,    // Scaled 3x from CSS 39px
+        vipFontSize: 135 // Scaled 3x from CSS 45px
+      }, 
+      template: "poster-template-vip.html" // Routes to the new HTML file below
+    },
+    Twitter: {
+      bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png",
+      width: 4800,
+      height: 2700,
+      layout: {
+        top: 192,       
+        left: 1437,     
+        align: "flex-start",
+        maxW: 65,       
+        scale: 1.125,   
+        uppercase: true,
+        baseFontSize: 115, 
+        minFontSize: 60,
+        vipTop: 2235,    // Scaled 3x and calculated from CSS absolute frame position
+        vipLeft: 186,    // Scaled 3x from CSS 62px
+        vipFontSize: 141 // Scaled 3x from CSS 47px
+      },
+      template: "poster-template-vip.html", // Routes to the new HTML file below
+    },
+  },
 };
 
 /**
@@ -157,16 +208,27 @@ async function processRecord(record) {
         }
     }
 
+    // Extract and parse VIP data by stripping out all non-numeric characters first
+    const rawVip = String(fields.vip_level_copy || '');
+    const parsedVipLevel = parseInt(rawVip.replace(/\D/g, ''), 10) || 0;
+    
+    // Fallback logic: Use custom copy if provided, otherwise build the standard string
+    const vipText = fields.vip_level 
+        ? fields.vip_level_copy 
+        : `<span class="vip-gold">✦</span> Instant <span class="vip-gold">VIP ${parsedVipLevel}</span> Upgrade`;
+
     return {
         ticket_id: ticketId,
         kol_uid: kolUid,
         kol_name: kolName,
         activity_record: activityRecord,
         record_id: recordId,
+        vip_level: parsedVipLevel,
         posterData: {
             kol_name: kolName,
             kol_logo_url: downloadedLogoDataUri,
-            has_logo: !!downloadedLogoDataUri
+            has_logo: !!downloadedLogoDataUri,
+            vip_text: parsedVipLevel > 0 ? vipText : null // <-- NEW: Pass the formatted text
         },
         should_generate_namecard: (fields.should_generate_namecard === 'Yes'), 
     };
@@ -201,7 +263,18 @@ async function main() {
         }
 
         if (data) {
-            const eventType = data.activity_record.trim();
+            let eventType = data.activity_record.trim();
+            if (data.vip_level > 0) {
+                const vipEventType = `${eventType} (VIP)`;
+                
+                // Check if a VIP configuration actually exists for this package
+                if (backgrounds[vipEventType]) {
+                    console.log(`[VIP] Level ${data.vip_level} detected. Upgrading format to ${vipEventType}...`);
+                    eventType = vipEventType;
+                } else {
+                    console.warn(`[VIP] Level ${data.vip_level} detected, but no VIP template found for '${eventType}'. Falling back to standard format.`);
+                }
+            }
             const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
             const folderPath = path.join(__dirname, 'banners', `${data.ticket_id}-${saneKolName}`);
             

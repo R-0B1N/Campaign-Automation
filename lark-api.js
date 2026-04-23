@@ -26,6 +26,8 @@ const LOGO_FIELD_NAME = "Profile Picture";
 const KOL_UID_FIELD_NAME = "KOL UID";
 const VIP_CODE_FIELD_NAME = "VIP Code"; 
 const GENERATED_VIP_LINK_FIELD_NAME = "注册链接"; 
+const VIP_LEVEL_FIELD_NAME = "VIP Level";
+const VIP_LEVEL_COPY_FIELD_NAME = "VIP Level Copy";
 const FIRST_TIME_KOL_FIELD_NAME = "Namecard"; // Assuming this is Yes/No for generating Namecards
 
 // --- OUTPUT ATTACHMENT FIELDS ---
@@ -142,6 +144,8 @@ async function getPendingRecords() {
             fields.kol_uid = fields[KOL_UID_FIELD_NAME];
             const namecardField = fields[FIRST_TIME_KOL_FIELD_NAME];
             fields.should_generate_namecard = namecardField && namecardField.text ? namecardField.text : namecardField;
+            fields.vip_level = extractLarkText(fields[VIP_LEVEL_FIELD_NAME]);
+            fields.vip_level_copy = extractLarkText(fields[VIP_LEVEL_COPY_FIELD_NAME]);
         });
 
         console.log(`Found ${records.length} records to process.`);
