@@ -1,12 +1,9 @@
-// renderer.js
 const puppeteer = require('puppeteer');
 const handlebars = require('handlebars');
 const fs = require('fs').promises;
 const path = require('path');
 
 async function generateImage(templateData, outputFilename, bgFileName, width = 1920, height = 1080, layout = { top: 80, left: 0, align: 'center', maxW: 100 }, templateFileName = 'poster-template.html') {
-    console.log(`Generating: ${outputFilename} (${width}x${height}) using ${templateFileName}`);
-
     const templateFilePath = path.resolve(__dirname, 'html-template', templateFileName);
     const absoluteBgPath = path.resolve(__dirname, 'image-template', 'backgrounds', bgFileName);
     const yubitLogoPath = path.resolve(__dirname, 'image-template', 'yubit-logo.png');
@@ -14,25 +11,23 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
     const fullOutputPath = path.join(__dirname, 'banners', outputFilename);
 
     let browser;
-
     try {
         await fs.mkdir(path.dirname(fullOutputPath), { recursive: true });
 
-        // 1. Files to Base64
-        const bgBuffer = await fs.readFile(absoluteBgPath);
+        // Load all file assets in parallel
+        const [bgBuffer, yubitBuffer, crossBuffer, htmlTemplate] = await Promise.all([
+            fs.readFile(absoluteBgPath),
+            fs.readFile(yubitLogoPath),
+            fs.readFile(crossLogoPath),
+            fs.readFile(templateFilePath, 'utf-8')
+        ]);
+
         const bgMime = bgFileName.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg';
         const bgImageDataUri = `data:${bgMime};base64,${bgBuffer.toString('base64')}`;
-
-        const yubitBuffer = await fs.readFile(yubitLogoPath);
         const yubitDataUri = `data:image/png;base64,${yubitBuffer.toString('base64')}`;
-
-        const crossBuffer = await fs.readFile(crossLogoPath);
         const crossDataUri = `data:image/png;base64,${crossBuffer.toString('base64')}`;
 
-        // 2. Compile HTML
-        const htmlTemplate = await fs.readFile(templateFilePath, 'utf-8');
         const template = handlebars.compile(htmlTemplate);
-
         const finalHtml = template({
             ...templateData,
             bg_image_data_uri: bgImageDataUri,
@@ -54,15 +49,14 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
         browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
         const page = await browser.newPage();
         
-        await page.setViewport({ width: width, height: height });
+        await page.setViewport({ width, height });
         await page.setContent(finalHtml, { waitUntil: 'load' });
-        await new Promise(resolve => setTimeout(resolve, 250));
+        await new Promise(resolve => setTimeout(resolve, 250)); // Render buffer
 
         await page.screenshot({ path: fullOutputPath, type: 'png' });
         await browser.close();
 
         return fullOutputPath;
-
     } catch (error) {
         if (browser) await browser.close();
         throw new Error(`Failed to generate ${outputFilename}: ${error.message}`);

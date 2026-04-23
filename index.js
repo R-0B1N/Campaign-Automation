@@ -1,507 +1,119 @@
-/*
- * index.js
- * Main automation script to process Lark records and generate banners.
- * Updated for the new 2-format (Sign Up & Twitter) dynamic layout structure.
- */
+const { getPendingRecords, downloadAttachmentUrlAsBase64, batchUpdateRecord } = require('./lark-api.js');
+const { processNamecard, processPosters, processLpProfile } = require('./generator.js');
+const config = require('./config.js');
 
-const {
-    getPendingRecords,
-    downloadAttachmentUrlAsBase64,
-    uploadAttachment,
-    batchUpdateRecord
-} = require('./lark-api.js');
-
-const { generateImage } = require('./renderer.js');
-const path = require('path');
-const fs = require('fs');
-const DEFAULT_LP_PROFILE_KV = path.join(__dirname, 'image-template', 'backgrounds', '福利中心KV.png');
-
-
-// --- MASTER TOGGLES ---
-const UPLOAD_TO_LARK = true;
-const GENERATE_SIGNUP = true;   // Set to false to skip Sign Up pages
-const GENERATE_TWITTER = true;   // Set to false to skip Twitter posts
-const GENERATE_NAMECARD = true;  // Set to false to override Lark and skip all Namecards
-const GENERATE_LP_PROFILE = true;
-
-// --- 1. FORMAT CONFIGURATION ---
-// Define dimensions and top padding for the centered Flexbox header
-// --- 1. FORMAT CONFIGURATION ---
-const formats = {
-    'SignUp': { 
-        width: 3900, 
-        height: 5364, 
-        layout: { top: 100, left: 0, align: 'center', maxW: 100 } // Center aligned
-    }, 
-    'Twitter': { 
-        width: 3366, 
-        height: 4362, 
-        layout: { top: 80, left: 0, align: 'center', maxW: 100 } // FIXED: Back to center aligned
-    }   
-};
-
-// --- 2. CAMPAIGN BACKGROUND MAPPING ---
-// Make sure these exact filenames exist in your "image-template/backgrounds" folder!
-const backgrounds = {
-  "20% Deposit Bonus": {
-    SignUp: "Sign Up Page-20% Deposit.png",
-    // 'Twitter': 'Twitter-20% Deposit.png',
-    Twitter: {
-      bg: "new 20% deposit.png",
-      width: 2272,
-      height: 2908,
-      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
-    },
-  },
-  "Deposit and Trade": {
-    SignUp: {
-      bg: "Sign Up Page-Deposit and Trade.png",
-      width: 2272,
-      height: 2908,
-      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
-    },
-    Twitter: {
-      bg: "Twitter-Deposit and Trade.png",
-      width: 2272,
-      height: 2908,
-      layout: { top: 50, left: 0, align: "center", maxW: 100, scale: 0.6, baseFontSize: 180, minFontSize: 150, },
-    },
-  },
-  "20,000 Welcome Bonus": {
-    SignUp: {
-      bg: "Sign Up Page-20,000 Welcome Bonus.png",
-      width: 3540,
-      height: 4104,
-      layout: { top: 200, left: 0, align: "center", maxW: 100 },
-    },
-    Twitter: {
-      bg: "Twitter-20,000 Welcome Bonus.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 220,
-        left: 180,
-        align: "flex-start",
-        maxW: 300,
-        scale: 0.9,
-        uppercase: true,
-        baseFontSize: 200,
-        minFontSize: 180,
-      },
-    },
-  },
-  "100% Deposit Bonus (Package A)": {
-    Twitter: {
-      bg: "Twitter-100% Deposit Bonus (Package A) Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 230,
-        left: 1450,
-        align: "flex-start",
-        maxW: 65,
-        scale: 0.9,
-        uppercase: true,
-        baseFontSize: 150,
-        minFontSize: 90,
-      },
-      template: "poster-template-nologo.html",
-    },
-  },
-  "50% Deposit Bonus (Package C)": {
-    Twitter: {
-      bg: "Twitter-50% Deposit Bonus (Package C) Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 220,
-        left: 1450,
-        align: "flex-start",
-        maxW: 65,
-        scale: 0.9,
-        uppercase: true,
-        baseFontSize: 150,
-        minFontSize: 90,
-      },
-      template: "poster-template-nologo.html",
-    },
-  },
-  "Package A 2.0": {
-    Twitter: {
-      bg: "Twitter-100% Deposit Bonus (Package A 2.0) Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 171,       
-        left: 1437,     
-        align: "flex-start",
-        maxW: 65,       
-        scale: 1.125,   // Scales base 288px logo to 324px
-        uppercase: true,
-        baseFontSize: 115, // 115 * 1.125 scale = ~129px target font size
-        minFontSize: 60,
-      },
-      template: "poster-template-nologo.html",
-    },
-  },
-  "Package A 2.0 (VIP)": {
-    SignUp: {
-      bg: "Sign Up Page-100% Deposit Bonus (Package A 2.0) VIP Template.png",
-      width: 3408, 
-      height: 4080, 
-      layout: { 
-        top: -9999, left: 0, align: "center", maxW: 100, // Pushes KOL header off-screen
-        vipTop: 1035,    // Scaled 3x from CSS 345px
-        vipLeft: 117,    // Scaled 3x from CSS 39px
-        vipFontSize: 135 // Scaled 3x from CSS 45px
-      }, 
-      template: "poster-template-vip.html" // Routes to the new HTML file below
-    },
-    Twitter: {
-      bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 192,       
-        left: 1437,     
-        align: "flex-start",
-        maxW: 65,       
-        scale: 1.125,   
-        uppercase: true,
-        baseFontSize: 115, 
-        minFontSize: 60,
-        vipTop: 2235,    // Scaled 3x and calculated from CSS absolute frame position
-        vipLeft: 186,    // Scaled 3x from CSS 62px
-        vipFontSize: 141 // Scaled 3x from CSS 47px
-      },
-      template: "poster-template-vip.html", // Routes to the new HTML file below
-    },
-  },
-  "Package B 2.0": {
-    Twitter: {
-      bg: "Twitter-20% Deposit Bonus (Package B) Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 171,       
-        left: 1437,     
-        align: "flex-start",
-        maxW: 65,       
-        scale: 1.125,   
-        uppercase: true,
-        baseFontSize: 115, 
-        minFontSize: 60,
-      },
-      template: "poster-template-nologo.html",
-    },
-  },
-  "Package B 2.0 (VIP)": {
-    SignUp: {
-      bg: "Sign Up Page- Package B 2.0 VIP Template.png",
-      width: 3408, 
-      height: 4080, 
-      layout: { 
-        top: -9999, left: 0, align: "center", maxW: 100, 
-        vipTop: 1035,   
-        vipLeft: 117,   
-        vipFontSize: 135 
-      }, 
-      template: "poster-template-vip.html" 
-    },
-    Twitter: {
-      bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png",
-      width: 4800,
-      height: 2700,
-      layout: {
-        top: 192,       
-        left: 1437,     
-        align: "flex-start",
-        maxW: 65,       
-        scale: 1.125,   
-        uppercase: true,
-        baseFontSize: 115, 
-        minFontSize: 60,
-        vipTop: 2235,   
-        vipLeft: 186,   
-        vipFontSize: 141 
-      },
-      template: "poster-template-vip.html", 
-    },
-  },
-};
+// --- NEW: Concurrency Control ---
+// Adjust this number based on your computer's RAM. 
+// 3 to 5 is usually the sweet spot for Puppeteer scripts.
+const CONCURRENCY_LIMIT = 3; 
 
 /**
- * Processes a single record from Lark to extract and prepare data.
+ * Helper function to split an array into smaller batches
  */
-async function processRecord(record) {
-    const fields = record.fields;
-
-    const kolName = fields.kol_name;
-    const kolLogoUrl = fields.kol_logo_url;
-    const hasLogo = fields.has_logo;
-    const ticketId = fields.ticket_id;
-    const kolUid = fields.kol_uid;
-    const activityRecord = fields.activity_record; 
-    const recordId = fields.record_id;
-
-    if (!kolName || !ticketId || !activityRecord) {
-        console.warn(`Skipping record ${recordId}: Missing KOL Name, Ticket ID, or Event Type.`);
-        return null;
+function chunkArray(array, size) {
+    const chunked = [];
+    for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
     }
+    return chunked;
+}
+
+async function parseRecordData(record) {
+    const { fields } = record;
+    if (!fields.kol_name || !fields.ticket_id || !fields.activity_record) return null;
 
     let downloadedLogoDataUri = null;
-    if (hasLogo && kolLogoUrl) {
+    if (fields.has_logo && fields.kol_logo_url) {
         try {
-            console.log(`Downloading image for record ${ticketId}...`);
-            downloadedLogoDataUri = await downloadAttachmentUrlAsBase64(kolLogoUrl);
+            downloadedLogoDataUri = await downloadAttachmentUrlAsBase64(fields.kol_logo_url);
         } catch (error) {
-            console.error(`Failed to download image for record ${ticketId}: ${error.message}`);
+            console.error(`Failed to download image for ${fields.ticket_id}:`, error.message);
         }
     }
 
-    // Extract and parse VIP data by stripping out all non-numeric characters first
     const rawVip = String(fields.vip_level_copy || '');
     const parsedVipLevel = parseInt(rawVip.replace(/\D/g, ''), 10) || 0;
-    
-    // Fallback logic: Use custom copy if provided, otherwise build the standard string
     const vipText = fields.vip_level 
         ? fields.vip_level_copy 
         : `<span class="vip-gold">✦</span> Instant <span class="vip-gold">VIP ${parsedVipLevel}</span> Upgrade`;
 
     return {
-        ticket_id: ticketId,
-        kol_uid: kolUid,
-        kol_name: kolName,
-        activity_record: activityRecord,
-        record_id: recordId,
+        ticket_id: fields.ticket_id,
+        kol_name: fields.kol_name,
+        activity_record: fields.activity_record,
+        record_id: fields.record_id,
         vip_level: parsedVipLevel,
+        should_generate_namecard: (fields.should_generate_namecard === 'Yes'),
         posterData: {
-            kol_name: kolName,
+            kol_name: fields.kol_name,
             kol_logo_url: downloadedLogoDataUri,
             has_logo: !!downloadedLogoDataUri,
-            vip_text: parsedVipLevel > 0 ? vipText : null // <-- NEW: Pass the formatted text
-        },
-        should_generate_namecard: (fields.should_generate_namecard === 'Yes'), 
+            vip_text: parsedVipLevel > 0 ? vipText : null
+        }
     };
+}
+
+// --- NEW: Extracted the single-record processing logic into its own function ---
+async function processSingleRecord(record) {
+    const ticketId = record.fields.ticket_id || record.record_id;
+    
+    const data = await parseRecordData(record);
+    if (!data) return;
+
+    let eventType = data.activity_record.trim();
+    if (data.vip_level > 0 && config.backgrounds[`${eventType} (VIP)`]) {
+        eventType = `${eventType} (VIP)`;
+    }
+
+    if (!config.backgrounds[eventType]) {
+        console.warn(`⚠️ Unknown Event Type '${eventType}' for ${ticketId}. Skipping.`);
+        return;
+    }
+
+    const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
+    const tokens = { signUpToken: null, twitterToken: null, namecardToken: null, lpProfileToken: null };
+
+    // Process all image types sequentially for this specific record
+    await processNamecard(data, saneKolName, tokens);
+    await processPosters(data, eventType, saneKolName, tokens);
+    await processLpProfile(data, saneKolName, tokens);
+
+    if (config.toggles.UPLOAD_TO_LARK) {
+        try {
+            await batchUpdateRecord(data.record_id, tokens);
+            console.log(`✅ Successfully finalized record ${data.record_id} (${data.kol_name}).`);
+        } catch (err) {
+            console.error(`❌ Failed to update record ${data.record_id} (${data.kol_name})`);
+        }
+    }
 }
 
 async function main() {
     console.log("Starting banner automation process...");
+    const records = await getPendingRecords();
+    if (!records.length) return console.log("No pending records found. All done!");
 
-    let records;
-    try {
-        records = await getPendingRecords();
-    } catch (error) {
-        console.error("❌ CRITICAL: Failed to get records from Lark.", error.message);
-        return;
-    }
+    // --- NEW: Batching Logic ---
+    const batches = chunkArray(records, CONCURRENCY_LIMIT);
+    console.log(`\nSplitting ${records.length} records into ${batches.length} batches of up to ${CONCURRENCY_LIMIT}...`);
 
-    if (!records || records.length === 0) {
-        console.log("No pending records found. All done!");
-        return;
-    }
-
-    for (const record of records) {
-        const ticketId = record.fields.ticket_id || record.record_id;
-        console.log(`\n--- Processing record ${ticketId} ---`);
-
-        let data;
-        try {
-            data = await processRecord(record);
-        } catch (error) {
-            console.error(`❌ Failed to process record ${ticketId}:`, error.message);
-            continue;
-        }
-
-        if (data) {
-            let eventType = data.activity_record.trim();
-            if (data.vip_level > 0) {
-                const vipEventType = `${eventType} (VIP)`;
-                
-                // Check if a VIP configuration actually exists for this package
-                if (backgrounds[vipEventType]) {
-                    console.log(`[VIP] Level ${data.vip_level} detected. Upgrading format to ${vipEventType}...`);
-                    eventType = vipEventType;
-                } else {
-                    console.warn(`[VIP] Level ${data.vip_level} detected, but no VIP template found for '${eventType}'. Falling back to standard format.`);
-                }
-            }
-            const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
-            const folderPath = path.join(__dirname, 'banners', `${data.ticket_id}-${saneKolName}`);
-            
-            if (!backgrounds[eventType]) {
-                console.warn(`⚠️ Warning: Unknown Event Type '${eventType}' for ${data.kol_name}. Skipping image generation.`);
-                continue;
-            }
-
-            let tokens = {
-                signUpToken: null,
-                twitterToken: null,
-                namecardToken: null,
-                lpProfileToken: null // Initialize new token
-            };
-
-            let allUploadsSucceeded = true;
-
-           // --- 3. GENERATE AND UPLOAD NAMECARD ---
-            if (GENERATE_NAMECARD && data.should_generate_namecard) {
-                console.log(`[Namecard] Requirement detected. Generating namecard for ${data.kol_name}...`);
-                
-                // NEW: Ensure this exactly matches the file in your image-template/backgrounds folder
-                const namecardBgFile = 'Namecard Template.png'; 
-                const namecardFilename = `${saneKolName}_Namecard.png`;
-
-                try {
-                    const namecardFilePath = await generateImage(
-                        data.posterData,
-                        path.join(`${data.ticket_id}-${saneKolName}`, namecardFilename),
-                        namecardBgFile,
-                        3200,  // NEW WIDTH
-                        1800,  // NEW HEIGHT
-                        { top: 0, left: 0, align: 'center', maxW: 100 }, 
-                        'namecard-template.html' 
-                    );
-
-                    if (UPLOAD_TO_LARK) {
-                        console.log(`Uploading Namecard...`);
-                        tokens.namecardToken = await uploadAttachment(namecardFilePath);
-                    }
-                } catch (error) {
-                    console.error(`❌ Failed on Namecard for ${data.kol_name}:`, error.message);
-                    allUploadsSucceeded = false;
-                }
-            }
-
-            // --- 3B. GENERATE AND UPLOAD BOTH POSTER FORMATS ---
-            for (const formatName in formats) {
-                if (formatName === 'SignUp' && !GENERATE_SIGNUP) continue;
-                if (formatName === 'Twitter' && !GENERATE_TWITTER) continue;
-
-                const globalConfig = formats[formatName];
-                const eventConfig = backgrounds[eventType][formatName];
-
-                // Safety check for missing formats
-                if (!eventConfig) {
-                    console.log(`[Skip] No ${formatName} layout configured for event: ${eventType}.`);
-                    continue;
-                }
-
-                const outputFilename = `${saneKolName}_${eventType.replace(/\s+/g, '')}_${formatName}.png`;
-                
-                let bgFileName, width, height, layout, templateFile;
-
-                // Dynamically route old format vs new format
-                if (typeof eventConfig === 'string') {
-                    bgFileName = eventConfig;
-                    width = globalConfig.width;
-                    height = globalConfig.height;
-                    layout = globalConfig.layout; 
-                    templateFile = 'poster-template.html';
-                } else {
-                    bgFileName = eventConfig.bg;
-                    width = eventConfig.width;
-                    height = eventConfig.height;
-                    layout = eventConfig.layout;
-                    templateFile = eventConfig.template || 'poster-template.html'; 
-                }
-
-                // Intercept and uppercase the KOL name if the layout flag is set
-                const formatPosterData = { ...data.posterData };
-                if (layout && layout.uppercase) {
-                    formatPosterData.kol_name = String(formatPosterData.kol_name).toUpperCase();
-                }
-
-                try {
-                    const generatedFilePath = await generateImage(
-                        formatPosterData,
-                        path.join(`${data.ticket_id}-${saneKolName}`, outputFilename),
-                        bgFileName,
-                        width,
-                        height,
-                        layout,
-                        templateFile
-                    );
-                    
-                    if (UPLOAD_TO_LARK) {
-                        console.log(`Uploading ${formatName} poster...`);
-                        const token = await uploadAttachment(generatedFilePath);
-                        
-                        if (formatName === 'SignUp') tokens.signUpToken = token;
-                        if (formatName === 'Twitter') tokens.twitterToken = token;
-                    }
-                } catch (error) {
-                    console.error(`❌ Failed on ${formatName} poster for ${data.kol_name}:`, error.message);
-                    allUploadsSucceeded = false;
-                }
-            }
-
-            // --- 3C. GENERATE AND UPLOAD LANDING PAGE PROFILE ---
-            if (GENERATE_LP_PROFILE) {
-                console.log(`[LP Profile] Handling for ${data.kol_name}...`);
-
-                if (data.posterData.has_logo) {
-                    console.log(`[LP Profile] Using provided KOL portrait. Generating custom image...`);
-                    const lpProfileBgFile = 'Landing Page KOL Profile Template.png'; 
-                    const lpProfileFilename = `${saneKolName}_LP_Profile.png`;
-
-                    try {
-                        const lpProfileFilePath = await generateImage(
-                            data.posterData, 
-                            path.join(`${data.ticket_id}-${saneKolName}`, lpProfileFilename),
-                            lpProfileBgFile,
-                            1040, 
-                            680,  
-                            { top: 0, left: 0, align: 'center', maxW: 100 }, 
-                            'lp-profile-template.html' 
-                        );
-
-                        if (UPLOAD_TO_LARK) {
-                            console.log(`Uploading Generated LP Profile...`);
-                            tokens.lpProfileToken = await uploadAttachment(lpProfileFilePath);
-                        }
-                    } catch (error) {
-                        console.error(`❌ Failed on LP Profile for ${data.kol_name}:`, error.message);
-                        allUploadsSucceeded = false;
-                    }
-                } else {
-                    console.log(`[LP Profile] No portrait found. Uploading raw default 福利中心KV...`);
-                    
-                    if (UPLOAD_TO_LARK) {
-                        try {
-                            // Uploads the raw file directly to Lark without passing it through puppeteer
-                            tokens.lpProfileToken = await uploadAttachment(DEFAULT_LP_PROFILE_KV);
-                        } catch (error) {
-                            console.error(`❌ Failed to upload default KV for ${data.kol_name}:`, error.message);
-                            allUploadsSucceeded = false;
-                        }
-                    }
-                }
-            }
+    for (const [index, batch] of batches.entries()) {
+        console.log(`\n=== 🚀 Starting Batch ${index + 1} of ${batches.length} ===`);
         
-            // --- 4. UPDATE LARK RECORD ---
-            if (allUploadsSucceeded && UPLOAD_TO_LARK) {
-                try {
-                    console.log(`Batch updating Lark record ${data.record_id}...`);
-                    // Call the updated lark-api function with 4 token arguments
-                    await batchUpdateRecord(data.record_id, {
-                        signUpToken: tokens.signUpToken,
-                        twitterToken: tokens.twitterToken,
-                        namecardToken: tokens.namecardToken,
-                        lpProfileToken: tokens.lpProfileToken // Added new token
-                    });
-                    console.log(`✅ Successfully finalized record ${data.record_id}.`);
-                } catch (updateError) {
-                    console.error(`❌ Failed to update record ${data.record_id}:`, updateError.message);
-                }
-            } else if (!UPLOAD_TO_LARK) {
-                console.log(`[UPLOAD DISABLED] Generation complete for ${data.kol_name}.`);
-            } else {
-                console.warn(`⚠️ Skipping Lark update for ${data.kol_name} due to upload failures.`);
+        // Promise.all runs everything inside the map() concurrently
+        await Promise.all(batch.map(async (record) => {
+            try {
+                await processSingleRecord(record);
+            } catch (error) {
+                // Catch errors here so one failed record doesn't crash the whole batch
+                console.error(`❌ Critical error processing record ${record.record_id}:`, error.message);
             }
-        }
+        }));
+        
+        console.log(`=== 🏁 Finished Batch ${index + 1} ===`);
     }
 
-    console.log("\n🎉 Automation process complete.");
+    console.log("\n🎉 All batches complete. Automation finished.");
 }
 
 main().catch(error => {
