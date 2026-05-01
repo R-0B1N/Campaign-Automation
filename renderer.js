@@ -49,6 +49,8 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
         browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
         const page = await browser.newPage();
         
+        page.on('console', msg => console.log('PAGE LOG:', msg.text()));
+
         await page.setViewport({ width, height });
         await page.setContent(finalHtml, { waitUntil: 'load' });
         await new Promise(resolve => setTimeout(resolve, 250)); // Render buffer

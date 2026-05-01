@@ -4,3 +4,5 @@ coverage/
 .env
 banners/
 node_modules/
+.DS_Store
+.DS_Store

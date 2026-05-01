@@ -1,11 +1,11 @@
-const { getPendingRecords, downloadAttachmentUrlAsBase64, batchUpdateRecord } = require('./lark-api.js');
+const { getPendingRecords, downloadAttachmentUrlAsBase64, batchUpdateRecord, getVipOptionMapping } = require('./lark-api.js');
 const { processNamecard, processPosters, processLpProfile } = require('./generator.js');
 const config = require('./config.js');
 
 // --- NEW: Concurrency Control ---
 // Adjust this number based on your computer's RAM. 
 // 3 to 5 is usually the sweet spot for Puppeteer scripts.
-const CONCURRENCY_LIMIT = 3; 
+const CONCURRENCY_LIMIT = 5;
 
 /**
  * Helper function to split an array into smaller batches
@@ -18,7 +18,7 @@ function chunkArray(array, size) {
     return chunked;
 }
 
-async function parseRecordData(record) {
+async function parseRecordData(record, vipMap) {
     const { fields } = record;
     if (!fields.kol_name || !fields.ticket_id || !fields.activity_record) return null;
 
@@ -31,11 +31,15 @@ async function parseRecordData(record) {
         }
     }
 
-    const rawVip = String(fields.vip_level_copy || '');
+    let rawVip = String(fields.vip_level || '');
+    if (vipMap && vipMap[rawVip]) {
+        rawVip = `VIP ${vipMap[rawVip].replace(/\D/g, '')}`;
+    }
+
     const parsedVipLevel = parseInt(rawVip.replace(/\D/g, ''), 10) || 0;
-    const vipText = fields.vip_level 
-        ? fields.vip_level_copy 
-        : `<span class="vip-gold">✦</span> Instant <span class="vip-gold">VIP ${parsedVipLevel}</span> Upgrade`;
+    const vipText = parsedVipLevel > 0 
+        ? `<span class="vip-gold">✦</span> Instant <span class="vip-gold">VIP ${parsedVipLevel}</span> Upgrade`
+        : null;
 
     return {
         ticket_id: fields.ticket_id,
@@ -54,10 +58,10 @@ async function parseRecordData(record) {
 }
 
 // --- NEW: Extracted the single-record processing logic into its own function ---
-async function processSingleRecord(record) {
+async function processSingleRecord(record, vipMap) {
     const ticketId = record.fields.ticket_id || record.record_id;
-    
-    const data = await parseRecordData(record);
+
+    const data = await parseRecordData(record, vipMap);
     if (!data) return;
 
     let eventType = data.activity_record.trim();
@@ -90,6 +94,10 @@ async function processSingleRecord(record) {
 
 async function main() {
     console.log("Starting banner automation process...");
+    
+    console.log("Fetching VIP mappings from Lark...");
+    const vipMap = await getVipOptionMapping();
+    
     const records = await getPendingRecords();
     if (!records.length) return console.log("No pending records found. All done!");
 
@@ -99,17 +107,17 @@ async function main() {
 
     for (const [index, batch] of batches.entries()) {
         console.log(`\n=== 🚀 Starting Batch ${index + 1} of ${batches.length} ===`);
-        
+
         // Promise.all runs everything inside the map() concurrently
         await Promise.all(batch.map(async (record) => {
             try {
-                await processSingleRecord(record);
+                await processSingleRecord(record, vipMap);
             } catch (error) {
                 // Catch errors here so one failed record doesn't crash the whole batch
                 console.error(`❌ Critical error processing record ${record.record_id}:`, error.message);
             }
         }));
-        
+
         console.log(`=== 🏁 Finished Batch ${index + 1} ===`);
     }
 

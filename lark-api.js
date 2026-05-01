@@ -27,7 +27,12 @@ async function getTenantAccessToken() {
 function extractLarkText(fieldData) {
     if (!fieldData) return null;
     if (typeof fieldData === 'string') return fieldData;
-    if (Array.isArray(fieldData)) return fieldData.map(item => item.text || '').join('');
+    if (Array.isArray(fieldData)) {
+        return fieldData.map(item => {
+            if (item && typeof item === 'object') return item.text || String(item.value || '');
+            return String(item || '');
+        }).join('');
+    }
     if (typeof fieldData === 'object') return fieldData.text || String(fieldData.value || '');
     return String(fieldData);
 }
@@ -154,4 +159,44 @@ async function batchUpdateRecord(recordId, tokens) {
     }
 }
 
-module.exports = { getPendingRecords, downloadAttachmentUrlAsBase64, uploadAttachment, batchUpdateRecord };
+async function getVipOptionMapping() {
+    try {
+        const token = await getTenantAccessToken();
+        
+        // 1. Get the VIP Level field metadata from the main table
+        let fieldsUrl = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${config.lark.TABLE_ID}/fields`;
+        let response = await axios.get(fieldsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+        
+        let vipField = response.data.data.items.find(f => f.field_name === config.schema.VIP_LEVEL);
+        if (!vipField || !vipField.property) {
+            return {}; 
+        }
+        
+        const targetTableId = vipField.property.target_table || (vipField.property.filter_info && vipField.property.filter_info.target_table);
+        const targetFieldId = vipField.property.target_field;
+
+        if (!targetTableId || !targetFieldId) return {};
+
+        // 2. Get the target field metadata from the target table
+        let targetFieldsUrl = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${targetTableId}/fields`;
+        response = await axios.get(targetFieldsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+        
+        let targetField = response.data.data.items.find(f => f.field_id === targetFieldId);
+        if (!targetField || !targetField.property || !targetField.property.options) {
+            return {};
+        }
+
+        // 3. Build the map
+        const map = {};
+        targetField.property.options.forEach(opt => {
+            map[opt.id] = opt.name;
+        });
+
+        return map;
+    } catch (error) {
+        console.error("⚠️ Failed to fetch VIP option mappings:", error.message);
+        return {}; // Return empty map so it doesn't break everything
+    }
+}
+
+module.exports = { getPendingRecords, downloadAttachmentUrlAsBase64, uploadAttachment, batchUpdateRecord, getVipOptionMapping };

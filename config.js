@@ -75,18 +75,18 @@ module.exports = {
             Twitter: { bg: "Twitter-50% Deposit Bonus (Package C) Template.png", width: 4800, height: 2700, layout: { top: 220, left: 1450, align: "flex-start", maxW: 65, scale: 0.9, uppercase: true, baseFontSize: 150, minFontSize: 90 }, template: "poster-template-nologo.html" },
         },
         "Package A 2.0": {
-            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) Template.png", width: 4800, height: 2700, layout: { top: 171, left: 1437, align: "flex-start", maxW: 65, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60 }, template: "poster-template-nologo.html" },
+            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 }, template: "poster-template-nologo.html" },
         },
         "Package A 2.0 (VIP)": {
             SignUp: { bg: "Sign Up Page-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 3408, height: 4080, layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1035, vipLeft: 117, vipFontSize: 135 }, template: "poster-template-vip.html" },
-            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 65, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
+            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
         },
         "Package B 2.0": {
-            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) Template.png", width: 4800, height: 2700, layout: { top: 171, left: 1437, align: "flex-start", maxW: 65, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60 }, template: "poster-template-nologo.html" },
+            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 }, template: "poster-template-nologo.html" },
         },
         "Package B 2.0 (VIP)": {
             SignUp: { bg: "Sign Up Page- Package B 2.0 VIP Template.png", width: 3408, height: 4080, layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1035, vipLeft: 117, vipFontSize: 135 }, template: "poster-template-vip.html" },
-            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 65, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
+            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
         },
     }
 };
