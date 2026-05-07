@@ -70,8 +70,7 @@ async function processSingleRecord(record, vipMap) {
     }
 
     if (!config.backgrounds[eventType]) {
-        console.warn(`⚠️ Unknown Event Type '${eventType}' for ${ticketId}. Skipping.`);
-        return;
+        console.warn(`⚠️ Unknown Event Type '${eventType}' for ${ticketId}. Posters will be skipped.`);
     }
 
     const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
