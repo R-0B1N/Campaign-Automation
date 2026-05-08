@@ -88,5 +88,8 @@ module.exports = {
             SignUp: { bg: "Sign Up Page- Package B 2.0 VIP Template.png", width: 3408, height: 4080, layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1035, vipLeft: 117, vipFontSize: 135 }, template: "poster-template-vip.html" },
             Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
         },
+        "Package C 2.0": {
+            Twitter: { bg: "Twitter-50,000 Welcome Bonus.png", width: 4800, height: 2700, layout: { top: 240, left: 200, align: "flex-start", maxW: 300, scale: 0.9, uppercase: true, baseFontSize: 180, minFontSize: 150 } },
+        },
     }
 };
