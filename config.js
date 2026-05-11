@@ -8,6 +8,7 @@ module.exports = {
         GENERATE_TWITTER: true,
         GENERATE_NAMECARD: true,
         GENERATE_LP_PROFILE: true,
+        PROCESS_TEST_RECORDS: false,
     },
 
     // --- APP CREDENTIALS ---
@@ -79,17 +80,101 @@ module.exports = {
         },
         "Package A 2.0 (VIP)": {
             SignUp: { bg: "Sign Up Page-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 3408, height: 4080, layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1035, vipLeft: 117, vipFontSize: 135 }, template: "poster-template-vip.html" },
-            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
+            Twitter: { bg: "Twitter-100% Deposit Bonus (Package A 2.0) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141, vipNoBox: true }, template: "poster-template-vip.html" },
         },
         "Package B 2.0": {
             Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 }, template: "poster-template-nologo.html" },
         },
         "Package B 2.0 (VIP)": {
             SignUp: { bg: "Sign Up Page- Package B 2.0 VIP Template.png", width: 3408, height: 4080, layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1035, vipLeft: 117, vipFontSize: 135 }, template: "poster-template-vip.html" },
-            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141 }, template: "poster-template-vip.html" },
+            Twitter: { bg: "Twitter-20% Deposit Bonus (Package B) VIP Template.png", width: 4800, height: 2700, layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2235, vipLeft: 186, vipFontSize: 141, vipNoBox: true }, template: "poster-template-vip.html" },
         },
         "Package C 2.0": {
             Twitter: { bg: "Twitter-50,000 Welcome Bonus.png", width: 4800, height: 2700, layout: { top: 240, left: 200, align: "flex-start", maxW: 300, scale: 0.9, uppercase: true, baseFontSize: 180, minFontSize: 150 } },
+        },
+        "Download App Bonus Package A": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package A.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus (Package A).png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Download App Bonus Package A (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package A VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus Package A VIP.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+                template: "poster-template-vip.html"
+            },
+        },
+        "Download App Bonus Package B": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package B.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus Package B.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Download App Bonus Package B (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package B VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus Package B VIP.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+                template: "poster-template-vip.html" 
+            },
+        },
+        "Download App Bonus Package C": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package C.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus Package C.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Download App Bonus Package C (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Download App Bonus Package C VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Download App Bonus Package C VIP.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+                template: "poster-template-vip.html" 
+            },
         },
     }
 };

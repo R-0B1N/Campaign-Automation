@@ -41,11 +41,15 @@ async function getPendingRecords() {
     const token = await getTenantAccessToken();
     const url = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${config.lark.TABLE_ID}/records`;
 
+    // --- NEW: Check the toggle to determine the target status ---
+    const targetStatus = config.toggles.PROCESS_TEST_RECORDS ? "Test" : "Pending";
+
     try {
         const response = await axios.get(url, {
             headers: { 'Authorization': `Bearer ${token}` },
             params: {
-                filter: `CurrentValue.[${config.schema.MATERIAL_COMPLETE}]="Pending"`,
+                // --- UPDATED: Use the dynamic targetStatus variable ---
+                filter: `CurrentValue.[${config.schema.MATERIAL_COMPLETE}]="${targetStatus}"`,
                 sort: JSON.stringify([`${config.schema.AUTO_NUMBER} DESC`]),
                 page_size: 50
             }

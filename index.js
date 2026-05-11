@@ -37,8 +37,19 @@ async function parseRecordData(record, vipMap) {
     }
 
     const parsedVipLevel = parseInt(rawVip.replace(/\D/g, ''), 10) || 0;
-    const vipText = parsedVipLevel > 0 
-        ? `<span class="vip-gold">✦</span> Instant <span class="vip-gold">VIP ${parsedVipLevel}</span> Upgrade`
+    
+    // Calculate the exact percentage OFF based on the Futures Taker fee table (Base 0.04%)
+    const discountMap = { 1: 12.5, 2: 25, 3: 37.5, 4: 50, 5: 62.5, 6: 75, 7: 80, 8: 100 };
+    const discountPercent = discountMap[parsedVipLevel] || 0;
+
+    
+  // Generate specific text formats
+    const signUpVipText = parsedVipLevel > 0 
+        ? `<span class="vip-gold">✦</span>&nbsp;Instant&nbsp;<span class="vip-gold">VIP ${parsedVipLevel}</span>&nbsp;Upgrade`
+        : null;
+        
+    const twitterVipText = parsedVipLevel > 0
+        ? `Instant&nbsp;<span class="vip-gold">VIP ${parsedVipLevel}</span>&nbsp;:&nbsp;${discountPercent}% OFF Fees`
         : null;
 
     return {
@@ -52,7 +63,9 @@ async function parseRecordData(record, vipMap) {
             kol_name: fields.kol_name,
             kol_logo_url: downloadedLogoDataUri,
             has_logo: !!downloadedLogoDataUri,
-            vip_text: parsedVipLevel > 0 ? vipText : null
+            signUpVipText: signUpVipText,
+            twitterVipText: twitterVipText,
+            vip_text: signUpVipText // Default fallback
         }
     };
 }

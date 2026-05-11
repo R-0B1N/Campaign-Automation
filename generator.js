@@ -41,6 +41,15 @@ async function processPosters(data, eventType, saneKolName, tokens) {
         const formatPosterData = { ...data.posterData };
         if (layout?.uppercase) formatPosterData.kol_name = String(formatPosterData.kol_name).toUpperCase();
 
+        if (formatName === 'SignUp' && formatPosterData.signUpVipText) {
+            formatPosterData.vip_text = formatPosterData.signUpVipText;
+        } else if (formatName === 'Twitter' && formatPosterData.twitterVipText) {
+            formatPosterData.vip_text = formatPosterData.twitterVipText;
+        }
+        
+        formatPosterData.is_twitter = (formatName === 'Twitter');
+        formatPosterData.show_twitter_box = (formatName === 'Twitter' && !layout?.vipNoBox);
+
         try {
             const filePath = await generateImage(
                 formatPosterData,

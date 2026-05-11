@@ -53,7 +53,6 @@
             height: calc(288px * var(--scale));
             border-radius: 50%;
             object-fit: cover;
-            /* border: calc(14px * var(--scale)) solid #A88755; */
             background-color: #000;
         }
 
@@ -66,23 +65,37 @@
             text-shadow: 14px 14px 24px rgba(0, 0, 0, 0.4); 
         }
 
-        /* NEW: Dynamic VIP Text Styling */
-        /* NEW: Dynamic VIP Text Styling */
+        /* --- NEW: Dynamic VIP Text Styling --- */
         .vip-highlight {
             position: absolute;
             top: {{vip_top}}px;
             left: {{vip_left}}px;
             font-family: 'Poppins', sans-serif;
-            font-weight: 400;
+            font-weight: 600; /* Keeps it slightly bold */
             font-size: {{vip_font_size}}px;
-            color: #FFFFFF; /* Changed base color to white */
+            color: #FFFFFF; /* Make sure this is white! */
             white-space: nowrap;
             z-index: 3;
         }
 
+        /* Applies the glowing pill-box ONLY for Twitter formats */
+        .vip-twitter-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 297px; 
+            padding: 0 120px;
+            background: linear-gradient(90deg, #000000 0%, #212121 100%);
+            border: 3px solid #F8D9A0;
+            box-shadow: 0px 0px 162px #FBCB6B;
+            border-radius: 300px;
+            box-sizing: border-box;
+            color: #FFFFFF; /* Overrides font to White inside the box */
+        }
+
         .vip-gold {
             color: #F8D9A0;
-            font-weight: 700; /* Bolds the text */
+            font-weight: 700; 
         }
     </style>
 </head>
@@ -97,7 +110,7 @@
     </div>
 
     {{#if vip_text}}
-        <div class="vip-highlight">{{{vip_text}}}</div> 
+        <div class="vip-highlight {{#if show_twitter_box}}vip-twitter-box{{/if}}">{{{vip_text}}}</div> 
     {{/if}}
 
     <script>
