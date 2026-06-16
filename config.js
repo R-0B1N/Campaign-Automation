@@ -100,7 +100,7 @@ module.exports = {
                 template: "poster-template-nologo.html"
             },
             Twitter: { 
-                bg: "Twitter-Download App Bonus (Package A).png", 
+                bg: "Twitter-Download App Bonus Package A.png", 
                 width: 4800, height: 2700, 
                 layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
                 template: "poster-template-nologo.html" 
@@ -171,6 +171,62 @@ module.exports = {
             },
             Twitter: { 
                 bg: "Twitter-Download App Bonus Package C VIP.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+                template: "poster-template-vip.html" 
+            },
+        },
+        "Position Voucher Package A": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Position Voucher Package A (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A VIP.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+                template: "poster-template-vip.html" 
+            },
+        },
+        "Position Voucher Package C": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package C.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package C.png", 
+                width: 4800, height: 2700, 
+                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Position Voucher Package C (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package C VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package C VIP.png", 
                 width: 4800, height: 2700, 
                 layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
                 template: "poster-template-vip.html" 
