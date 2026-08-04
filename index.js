@@ -65,7 +65,8 @@ async function parseRecordData(record, vipMap) {
             has_logo: !!downloadedLogoDataUri,
             signUpVipText: signUpVipText,
             twitterVipText: twitterVipText,
-            vip_text: signUpVipText // Default fallback
+            vip_text: signUpVipText, // Default fallback
+            vip_level: parsedVipLevel
         }
     };
 }

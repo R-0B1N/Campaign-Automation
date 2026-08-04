@@ -41,10 +41,25 @@ async function processPosters(data, eventType, saneKolName, tokens) {
         const formatPosterData = { ...data.posterData };
         if (layout?.uppercase) formatPosterData.kol_name = String(formatPosterData.kol_name).toUpperCase();
 
-        if (formatName === 'SignUp' && formatPosterData.signUpVipText) {
+        formatPosterData.use_vip_pill_box = !!layout?.useVipPillBox;
+        formatPosterData.use_yubit_x_kol = !!layout?.useYubitXKol;
+        
+        formatPosterData.header_top = layout?.headerTop || 42;
+        formatPosterData.header_left = layout?.headerLeft || 51;
+        formatPosterData.vip_top = layout?.vipTop || 403;
+        formatPosterData.vip_left = layout?.vipLeft || 46;
+
+        if (layout?.useVipPillBox && formatPosterData.vip_level > 0) {
+            // Check if plainVipText is specified in layout to avoid applying gold color
+            if (layout?.plainVipText) {
+                formatPosterData.vip_text = `INSTANT VIP ${formatPosterData.vip_level} UPGRADE`;
+            } else {
+                formatPosterData.vip_text = `INSTANT <span class="vip-gold">VIP ${formatPosterData.vip_level}</span> UPGRADE`;
+            }
+        } else if (formatName === 'SignUp' && formatPosterData.signUpVipText) {
             formatPosterData.vip_text = formatPosterData.signUpVipText;
         } else if (formatName === 'Twitter' && formatPosterData.twitterVipText) {
-            formatPosterData.vip_text = formatPosterData.twitterVipText;
+            formatPosterData.vip_text = layout?.useSignUpVipText ? formatPosterData.signUpVipText : formatPosterData.twitterVipText;
         }
         
         formatPosterData.is_twitter = (formatName === 'Twitter');

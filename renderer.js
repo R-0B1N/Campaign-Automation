@@ -26,15 +26,29 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
         const bgImageDataUri = `data:${bgMime};base64,${bgBuffer.toString('base64')}`;
         const yubitDataUri = `data:image/png;base64,${yubitBuffer.toString('base64')}`;
         const crossDataUri = `data:image/png;base64,${crossBuffer.toString('base64')}`;
+        
+        let vipDiamondDataUri = null;
+        if (templateData.use_vip_pill_box && templateData.vip_level > 0) {
+            const diamondPath = path.resolve(__dirname, 'image-template', 'vip', `VIP ${templateData.vip_level}.png`);
+            try {
+                const diamondBuffer = await fs.readFile(diamondPath);
+                vipDiamondDataUri = `data:image/png;base64,${diamondBuffer.toString('base64')}`;
+            } catch (err) {
+                console.warn(`Could not load diamond for VIP level ${templateData.vip_level}`);
+            }
+        }
 
         const template = handlebars.compile(htmlTemplate);
         const finalHtml = template({
             ...templateData,
             bg_image_data_uri: bgImageDataUri,
             yubit_logo_data_uri: yubitDataUri,   
-            cross_logo_data_uri: crossDataUri,   
+            cross_logo_data_uri: crossDataUri,
+            vip_diamond_data_uri: vipDiamondDataUri,
             header_top_margin: layout.top || 80,
             header_left_margin: layout.left || 0,
+            header_top: layout.headerTop || 42,
+            header_left: layout.headerLeft || 51,
             header_align: layout.align || 'center',
             header_max_width: layout.maxW || 100,
             header_scale: layout.scale || 1.0,
@@ -42,7 +56,7 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
             header_base_font_size: layout.baseFontSize || 336, 
             header_min_font_size: layout.minFontSize || 192,
             vip_top: layout.vipTop || 0,
-            vip_left: layout.vipLeft || 0,
+            vip_left: layout.vipLeft || 51,
             vip_font_size: layout.vipFontSize || 135
         });
 

@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html dir="{{text_direction}}">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Yubit 3.0 Campaign</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Noto+Sans+SC:wght@700&family=Poppins:wght@600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --scale: {{header_scale}};
+        }
+
+        body {
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: 'Montserrat', 'Noto Sans SC', sans-serif;
+            position: relative;
+            background-color: #0B0B0B;
+            overflow: hidden;
+        }
+
+        .background-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 1;
+        }
+
+        /* YUBIT X KOL Header */
+        .dynamic-header {
+            position: absolute;
+
+            top: calc({{header_top}}px * var(--scale));
+            left: calc({{header_left}}px * var(--scale));
+            max-width: calc(876px * var(--scale));
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 0px;
+        gap: calc(5px * var(--scale));
+        z-index: 2;
+        }
+
+        .yubit-logo {
+            width: calc(275px * var(--scale));
+            height: calc(92px * var(--scale));
+            object-fit: contain;
+        }
+
+        .separator-icon {
+            width: calc(48px * var(--scale));
+            height: calc(48px * var(--scale));
+            object-fit: contain;
+        }
+
+        .kol-container {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: calc(25px * var(--scale));
+        }
+
+        .kol-logo {
+            width: calc(86px * var(--scale));
+            height: calc(86px * var(--scale));
+            border-radius: 50%;
+            object-fit: cover;
+            background-color: #000;
+            border: calc(1px * var(--scale)) solid #FFFFFF;
+        }
+
+        .kol-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 180px;
+            font-weight: 700;
+            color: #FFFFFF;
+            font-variant: all-small-caps;
+            white-space: nowrap;
+            /* Adjust this value to move the text up or down (negative values move it up) */
+            transform: translateY(calc(-5px * var(--scale)));
+        }
+
+        /* VIP Pill Box */
+        .vip-highlight {
+            position: absolute;
+            top: calc({{vip_top}}px * var(--scale));
+            left: calc({{vip_left}}px * var(--scale));
+            display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        padding: calc(9.3px * var(--scale)) calc(23.2px * var(--scale));
+        gap: calc(12.4px * var(--scale));
+        width: calc(468px * var(--scale));
+        height: calc(65px * var(--scale));
+        border-radius: calc(77.5px * var(--scale));
+        box-sizing: border-box;
+
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45.19%, #1F0900 90.87%);
+        z-index: 3;
+        }
+
+        .vip-highlight::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            border-radius: inherit;
+            padding: calc(2px * var(--scale));
+            background: linear-gradient(94.6deg, #FFD06E 1.08%, #FFE6B8 47.17%, #D0A463 89.99%);
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            pointer-events: none;
+        }
+
+        .vip-diamond {
+            width: calc(44.93px * var(--scale));
+            height: calc(44.93px * var(--scale));
+            object-fit: contain;
+            flex: none;
+        }
+
+        .vip-text {
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: calc(30px * var(--scale));
+            line-height: calc(45px * var(--scale));
+            color: #FFFFFF;
+            white-space: nowrap;
+            flex: none;
+        }
+
+        .vip-gold {
+            color: #FF6F00;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <img src="{{{bg_image_data_uri}}}" class="background-layer" alt="Background">
+
+    {{#if use_yubit_x_kol}}
+    <div class="dynamic-header">
+        <img src="{{yubit_logo_data_uri}}" class="yubit-logo" alt="YUBIT">
+        <img src="{{cross_logo_data_uri}}" class="separator-icon" alt="x">
+
+        <div class="kol-container">
+            {{#if has_logo}}
+            <img src="{{kol_logo_url}}" class="kol-logo" alt="KOL">
+            {{/if}}
+            <span class="kol-name">{{kol_name}}</span>
+        </div>
+    </div>
+    {{/if}}
+
+    {{#if use_vip_pill_box}}
+    {{#if vip_text}}
+    <div class="vip-highlight">
+        {{#if vip_diamond_data_uri}}
+        <img src="{{{vip_diamond_data_uri}}}" class="vip-diamond" alt="VIP Diamond">
+        {{/if}}
+        <span class="vip-text">{{{vip_text}}}</span>
+    </div>
+    {{/if}}
+    {{/if}}
+
+    <script>
+        document.fonts.ready.then(() => {
+            const kolName = document.querySelector('.kol-name');
+            // Using quotes prevents code formatters from breaking the Handlebars tags
+            const scale = Number("{{header_scale}}");
+
+            if (kolName) {
+                // ---------------------------------------------------------
+                // 🛠️ ADJUST FONT SIZES HERE (in final absolute pixels)
+                // ---------------------------------------------------------
+                const maxFontSize = 180;  // Change this for the starting maximum size
+                const minFontSize = 120;  // Change this for how small it's allowed to shrink
+
+                let calculatedFontSize = maxFontSize;
+                kolName.style.fontSize = calculatedFontSize + 'px';
+
+                // Adjust font size dynamically if it overflows its container
+                const header = document.querySelector('.dynamic-header');
+                if (header) {
+                    let fontSize = calculatedFontSize;
+                    // Note: header needs a max-width for this to trigger properly
+                    while (kolName.scrollWidth > header.clientWidth && fontSize > minFontSize) {
+                        fontSize -= 2;
+                        kolName.style.fontSize = fontSize + 'px';
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -29,8 +29,10 @@ module.exports = {
         LOGO: "Profile Picture",
         KOL_UID: "KOL UID",
         VIP_CODE: "VIP Code",
-        VIP_LEVEL: "VIP Level",
-        VIP_LEVEL_COPY: "VIP Level Copy",
+        // VIP_LEVEL: "VIP Level",
+        // VIP_LEVEL_COPY: "VIP Level (Old)",
+        VIP_LEVEL: "VIP Level (Old)",
+        VIP_LEVEL_COPY: "VIP Level",
         FIRST_TIME_KOL: "Namecard",
         SIGN_UP_MATERIAL: "Sign Up Page 物料",
         TWITTER_MATERIAL: "Twitter 物料",
@@ -176,34 +178,34 @@ module.exports = {
                 template: "poster-template-vip.html" 
             },
         },
-        "Position Voucher Package A": {
-            SignUp: { 
-                bg: "Sign Up Page-Position Voucher Package A.png", 
-                width: 3408, height: 4080, 
-                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
-                template: "poster-template-nologo.html"
-            },
-            Twitter: { 
-                bg: "Twitter-Position Voucher Package A.png", 
-                width: 4800, height: 2700, 
-                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
-                template: "poster-template-nologo.html" 
-            },
-        },
-        "Position Voucher Package A (VIP)": {
-            SignUp: { 
-                bg: "Sign Up Page-Position Voucher Package A VIP.png", 
-                width: 3408, height: 4080, 
-                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
-                template: "poster-template-vip.html" 
-            },
-            Twitter: { 
-                bg: "Twitter-Position Voucher Package A VIP.png", 
-                width: 4800, height: 2700, 
-                layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
-                template: "poster-template-vip.html" 
-            },
-        },
+        // "Position Voucher Package A": {
+        //     SignUp: { 
+        //         bg: "Sign Up Page-Position Voucher Package A.png", 
+        //         width: 3408, height: 4080, 
+        //         layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+        //         template: "poster-template-nologo.html"
+        //     },
+        //     Twitter: { 
+        //         bg: "Twitter-Position Voucher Package A.png", 
+        //         width: 4800, height: 2700, 
+        //         layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 50 },
+        //         template: "poster-template-nologo.html" 
+        //     },
+        // },
+        // "Position Voucher Package A (VIP)": {
+        //     SignUp: { 
+        //         bg: "Sign Up Page-Position Voucher Package A VIP.png", 
+        //         width: 3408, height: 4080, 
+        //         layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+        //         template: "poster-template-vip.html" 
+        //     },
+        //     Twitter: { 
+        //         bg: "Twitter-Position Voucher Package A VIP.png", 
+        //         width: 4800, height: 2700, 
+        //         layout: { top: 192, left: 1437, align: "flex-start", maxW: 40, scale: 1.125, uppercase: true, baseFontSize: 115, minFontSize: 60, vipTop: 2127, vipLeft: 186, vipFontSize: 141 },
+        //         template: "poster-template-vip.html" 
+        //     },
+        // },
         "Position Voucher Package C": {
             SignUp: { 
                 bg: "Sign Up Page-Position Voucher Package C.png", 
@@ -232,5 +234,133 @@ module.exports = {
                 template: "poster-template-vip.html" 
             },
         },
+        "Position Voucher Package A": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A Template.png", 
+                width: 1136, height: 1360, 
+                layout: { top: 42, left: 394, align: "flex-start", maxW: 48, scale: 0.2986, uppercase: true, baseFontSize: 144, minFontSize: 40 },
+                template: "poster-template-nologo.html" 
+            },
+        },
+        "Position Voucher Package A (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A VIP Template.png", 
+                width: 1136, height: 1360, 
+                layout: { top: 42, left: 394, align: "flex-start", maxW: 48, scale: 0.2986, uppercase: true, baseFontSize: 144, minFontSize: 40, vipTop: 364, vipLeft: 42, vipFontSize: 40, vipNoBox: true, useSignUpVipText: true },
+                template: "poster-template-vip.html" 
+            },
+        },
+        "July Giveaway": {
+            SignUp: { 
+                bg: "Sign Up Page-July Giveaway.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100 },
+                template: "poster-template-nologo.html"
+            }
+        },
+        "July Giveaway (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-July Giveaway VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, vipTop: 1065, vipLeft: 117, vipFontSize: 135 }, 
+                template: "poster-template-vip.html"
+            }
+        },
+        "Position Voucher Package A 3.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher A 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher A 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package A 3.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher A 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipPillBox: true, vipTop: 403, vipLeft: 46 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher A 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51, useVipPillBox: true, vipTop: 421, vipLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Futures Bonus A 3.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus A 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus A 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Futures Bonus A 3.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus A 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipPillBox: true, vipTop: 403, vipLeft: 46 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus A 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51, useVipPillBox: true, vipTop: 421, vipLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package B 3.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher B 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher B 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48 , headerLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package B 3.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher B 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipPillBox: true, vipTop: 403, vipLeft: 46 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher B 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51, useVipPillBox: true, vipTop: 421, vipLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        }
     }
 };
