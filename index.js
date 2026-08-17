@@ -87,7 +87,7 @@ async function processSingleRecord(record, vipMap) {
         console.warn(`⚠️ Unknown Event Type '${eventType}' for ${ticketId}. Posters will be skipped.`);
     }
 
-    const saneKolName = String(data.kol_name).replace(/[\\?%*:|"<> \/]/g, '_');
+    const saneKolName = String(data.kol_name).replace(/[\r\n]/g, '').replace(/[\\?%*:|"<> \/]/g, '_');
     const tokens = { signUpToken: null, twitterToken: null, namecardToken: null, lpProfileToken: null };
 
     // Process all image types sequentially for this specific record

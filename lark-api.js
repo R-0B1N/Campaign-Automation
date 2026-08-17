@@ -26,15 +26,15 @@ async function getTenantAccessToken() {
 
 function extractLarkText(fieldData) {
     if (!fieldData) return null;
-    if (typeof fieldData === 'string') return fieldData;
+    if (typeof fieldData === 'string') return fieldData.trim();
     if (Array.isArray(fieldData)) {
         return fieldData.map(item => {
             if (item && typeof item === 'object') return item.text || String(item.value || '');
             return String(item || '');
-        }).join('');
+        }).join('').trim();
     }
-    if (typeof fieldData === 'object') return fieldData.text || String(fieldData.value || '');
-    return String(fieldData);
+    if (typeof fieldData === 'object') return (fieldData.text || String(fieldData.value || '')).trim();
+    return String(fieldData).trim();
 }
 
 async function getPendingRecords() {
