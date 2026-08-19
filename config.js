@@ -334,6 +334,34 @@ module.exports = {
                 template: "poster-template-v3.html" 
             }
         },
+        "Futures Bonus B 3.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus B 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus B 3.0.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Futures Bonus B 3.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus B 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipPillBox: true, vipTop: 403, vipLeft: 46 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus B 3.0 VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51, useVipPillBox: true, vipTop: 421, vipLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
         "Position Voucher Package B 3.0": {
             SignUp: { 
                 bg: "Sign Up Page-Position Voucher B 3.0.png", 
@@ -387,6 +415,34 @@ module.exports = {
                 bg: "Twitter-Position Voucher 3.0 Iran VIP.png", 
                 width: 3408, height: 4080, 
                 layout: { useYubitXKol: true, scale: 3, headerTop: 48, headerLeft: 51, useVipPillBox: true, vipTop: 421, vipLeft: 51 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "10% Deposit Bonus": {
+            SignUp: { 
+                bg: "Sign-Up 10% Deposit.png", 
+                width: 3426, height: 4098, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit.png", 
+                width: 3426, height: 4098, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 41, headerLeft: 61 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "10% Deposit Bonus (VIP)": {
+            SignUp: { 
+                bg: "Sign Up-10% Deposit VIP.png", 
+                width: 3426, height: 4098, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipCardText: true, vipCardTop: 616, vipCardLeft: 783, vipCardWidth: 268, vipCardHeight: 98 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit VIP.png", 
+                width: 3426, height: 4098, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 41, headerLeft: 61, useVipCardText: true, vipCardTop: 670, vipCardLeft: 783, vipCardWidth: 268, vipCardHeight: 98 }, 
                 template: "poster-template-v3.html" 
             }
         }

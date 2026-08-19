@@ -19,8 +19,9 @@ async function testRender() {
 
     const campaigns = [
         "Position Voucher Package A 3.0",
-        "Futures Bonus Package A 3.0",
-        "Position Voucher Package B 3.0"
+        "Futures Bonus A 3.0",
+        "Position Voucher Package B 3.0",
+        "10% Deposit Bonus"
     ];
 
     const tests = [];
@@ -78,6 +79,16 @@ async function testRender() {
             } else {
                 formatPosterData.vip_text = `INSTANT <span class="vip-gold">VIP 2</span> UPGRADE`;
             }
+        }
+
+        if (test.conf.layout?.useVipCardText) {
+            formatPosterData.use_vip_card_text = true;
+            formatPosterData.vip_level = 4;
+            formatPosterData.vip_discount_percent = 50;
+            formatPosterData.vip_card_top = test.conf.layout?.vipCardTop || 616;
+            formatPosterData.vip_card_left = test.conf.layout?.vipCardLeft || 783;
+            formatPosterData.vip_card_width = test.conf.layout?.vipCardWidth || 268;
+            formatPosterData.vip_card_height = test.conf.layout?.vipCardHeight || 98;
         }
 
         formatPosterData.use_yubit_x_kol = !!test.conf.layout?.useYubitXKol;

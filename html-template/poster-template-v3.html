@@ -145,6 +145,34 @@
             color: #FF6F00;
             font-weight: 600;
         }
+
+        /* VIP Discount Card Text (10% Deposit Bonus) */
+        .vip-card-text {
+            position: absolute;
+            top: calc({{vip_card_top}}px * var(--scale));
+            left: calc({{vip_card_left}}px * var(--scale));
+            width: calc({{vip_card_width}}px * var(--scale));
+            height: calc({{vip_card_height}}px * var(--scale));
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 700;
+            font-size: calc(32.5px * var(--scale));
+            line-height: calc(49px * var(--scale));
+            color: #FFFFFF;
+            z-index: 3;
+        }
+
+        .vip-card-gradient {
+            background: linear-gradient(180deg, #FB8B03 0%, #F55602 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            color: transparent;
+        }
     </style>
 </head>
 
@@ -172,6 +200,15 @@
         <img src="{{{vip_diamond_data_uri}}}" class="vip-diamond" alt="VIP Diamond">
         {{/if}}
         <span class="vip-text">{{{vip_text}}}</span>
+    </div>
+    {{/if}}
+    {{/if}}
+
+    {{#if use_vip_card_text}}
+    {{#if vip_level}}
+    <div class="vip-card-text">
+        <div>INSTANT&nbsp;<span class="vip-card-gradient">VIP&nbsp;{{vip_level}}</span></div>
+        <div><span class="vip-card-gradient">{{vip_discount_percent}}%&nbsp;OFF</span>&nbsp;FEES</div>
     </div>
     {{/if}}
     {{/if}}

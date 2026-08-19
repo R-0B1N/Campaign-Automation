@@ -66,7 +66,8 @@ async function parseRecordData(record, vipMap) {
             signUpVipText: signUpVipText,
             twitterVipText: twitterVipText,
             vip_text: signUpVipText, // Default fallback
-            vip_level: parsedVipLevel
+            vip_level: parsedVipLevel,
+            vip_discount_percent: discountPercent
         }
     };
 }

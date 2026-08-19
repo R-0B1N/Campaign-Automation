@@ -57,7 +57,11 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
             header_min_font_size: layout.minFontSize || 192,
             vip_top: layout.vipTop || 0,
             vip_left: layout.vipLeft || 51,
-            vip_font_size: layout.vipFontSize || 135
+            vip_font_size: layout.vipFontSize || 135,
+            vip_card_top: layout.vipCardTop || 616,
+            vip_card_left: layout.vipCardLeft || 783,
+            vip_card_width: layout.vipCardWidth || 268,
+            vip_card_height: layout.vipCardHeight || 98
         });
 
         browser = await puppeteer.launch({ headless: "new", args: ['--no-sandbox'] });
