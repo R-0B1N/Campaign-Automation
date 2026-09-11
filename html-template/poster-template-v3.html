@@ -97,18 +97,18 @@
             top: calc({{vip_top}}px * var(--scale));
             left: calc({{vip_left}}px * var(--scale));
             display: flex;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        padding: calc(9.3px * var(--scale)) calc(23.2px * var(--scale));
-        gap: calc(12.4px * var(--scale));
-        width: calc(468px * var(--scale));
-        height: calc(65px * var(--scale));
-        border-radius: calc(77.5px * var(--scale));
-        box-sizing: border-box;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            padding: calc(9.3px * var(--scale)) calc(23.2px * var(--scale));
+            gap: calc(12.4px * var(--scale));
+            width: calc({{vip_width}}px * var(--scale));
+            height: calc({{vip_height}}px * var(--scale));
+            border-radius: calc(77.5px * var(--scale));
+            box-sizing: border-box;
 
-        background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45.19%, #1F0900 90.87%);
-        z-index: 3;
+            background: linear-gradient(180deg, rgba(0, 0, 0, 0) 45.19%, #1F0900 90.87%);
+            z-index: 3;
         }
 
         .vip-highlight::before {
@@ -125,16 +125,16 @@
         }
 
         .vip-diamond {
-            width: calc(44.93px * var(--scale));
-            height: calc(44.93px * var(--scale));
+            width: calc({{vip_diamond_width}}px * var(--scale));
+            height: calc({{vip_diamond_width}}px * var(--scale));
             object-fit: contain;
             flex: none;
         }
 
         .vip-text {
             font-family: 'Poppins', sans-serif;
-            font-weight: 600;
-            font-size: calc(30px * var(--scale));
+            font-weight: {{vip_font_weight}};
+            font-size: calc({{vip_font_size}}px * var(--scale));
             line-height: calc(45px * var(--scale));
             color: #FFFFFF;
             white-space: nowrap;
@@ -143,7 +143,7 @@
 
         .vip-gold {
             color: #FF6F00;
-            font-weight: 600;
+            font-weight: {{vip_font_weight}};
         }
 
         /* VIP Discount Card Text (10% Deposit Bonus) */
@@ -181,8 +181,10 @@
 
     {{#if use_yubit_x_kol}}
     <div class="dynamic-header">
+        {{#unless hide_yubit_logo}}
         <img src="{{yubit_logo_data_uri}}" class="yubit-logo" alt="YUBIT">
         <img src="{{cross_logo_data_uri}}" class="separator-icon" alt="x">
+        {{/unless}}
 
         <div class="kol-container">
             {{#if has_logo}}

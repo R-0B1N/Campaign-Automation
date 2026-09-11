@@ -23,7 +23,7 @@ module.exports = {
     schema: {
         MATERIAL_COMPLETE: "Status",
         AUTO_NUMBER: "Event ID",
-        ACTIVITY_RECORD: "Event Type",
+        ACTIVITY_RECORD: "Event Name",
         KOL_NAME: "KOL Profile",
         LANGUAGE: "Language",
         LOGO: "Profile Picture",
@@ -443,6 +443,34 @@ module.exports = {
                 bg: "Twitter-10% Deposit VIP.png", 
                 width: 3426, height: 4098, 
                 layout: { useYubitXKol: true, scale: 3, headerTop: 41, headerLeft: 61, useVipCardText: true, vipCardTop: 670, vipCardLeft: 783, vipCardWidth: 268, vipCardHeight: 98 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package A 4.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package A 4.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package A 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 346, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package A 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
                 template: "poster-template-v3.html" 
             }
         }

@@ -41,14 +41,17 @@ async function processPosters(data, eventType, saneKolName, tokens) {
         const formatPosterData = { ...data.posterData };
         if (layout?.uppercase) formatPosterData.kol_name = String(formatPosterData.kol_name).toUpperCase();
 
-        formatPosterData.use_vip_pill_box = !!layout?.useVipPillBox;
+        formatPosterData.use_vip_pill_box = !!(layout?.useVipPillBox || layout?.useVipFeeBox);
         formatPosterData.use_yubit_x_kol = !!layout?.useYubitXKol;
+        formatPosterData.hide_yubit_logo = !!layout?.hideYubitLogo;
         formatPosterData.use_vip_card_text = !!layout?.useVipCardText;
         
         formatPosterData.header_top = layout?.headerTop || 42;
         formatPosterData.header_left = layout?.headerLeft || 51;
         formatPosterData.vip_top = layout?.vipTop || 403;
         formatPosterData.vip_left = layout?.vipLeft || 46;
+        formatPosterData.vip_width = layout?.vipWidth || (layout?.useVipFeeBox ? 543 : 468);
+        formatPosterData.vip_height = layout?.vipHeight || 65;
         formatPosterData.vip_card_top = layout?.vipCardTop || 616;
         formatPosterData.vip_card_left = layout?.vipCardLeft || 783;
         formatPosterData.vip_card_width = layout?.vipCardWidth || 268;
@@ -59,7 +62,9 @@ async function processPosters(data, eventType, saneKolName, tokens) {
             formatPosterData.vip_discount_percent = discountMap[formatPosterData.vip_level] || 0;
         }
 
-        if (layout?.useVipPillBox && formatPosterData.vip_level > 0) {
+        if (layout?.useVipFeeBox && formatPosterData.vip_level > 0) {
+            formatPosterData.vip_text = `INSTANT <span class="vip-gold">VIP ${formatPosterData.vip_level}</span> : ${formatPosterData.vip_discount_percent}% OFF FEES`;
+        } else if (layout?.useVipPillBox && formatPosterData.vip_level > 0) {
             // Check if plainVipText is specified in layout to avoid applying gold color
             if (layout?.plainVipText) {
                 formatPosterData.vip_text = `INSTANT VIP ${formatPosterData.vip_level} UPGRADE`;
