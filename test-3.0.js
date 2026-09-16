@@ -21,6 +21,8 @@ async function testRender() {
         "Position Voucher Package A 3.0",
         "Futures Bonus A 3.0",
         "Position Voucher Package B 3.0",
+        "10% Deposit TradFi",
+        "10% Deposit Futures Bonus",
         "10% Deposit Bonus"
     ];
 

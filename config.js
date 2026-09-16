@@ -24,6 +24,7 @@ module.exports = {
         MATERIAL_COMPLETE: "Status",
         AUTO_NUMBER: "Event ID",
         ACTIVITY_RECORD: "Event Name",
+        EVENT_TYPE: "Event Type",
         KOL_NAME: "KOL Profile",
         LANGUAGE: "Language",
         LOGO: "Profile Picture",
@@ -38,6 +39,76 @@ module.exports = {
         TWITTER_MATERIAL: "Twitter 物料",
         NAMECARD_MATERIAL: "Name Card",
         LP_PROFILE_MATERIAL: "Landing Page Profile Picture",
+    },
+
+    // --- EVENT TYPE / NAME MAPPINGS ---
+    eventMappings: {
+        "10% Deposit Bonus | TradFi Bonus": "10% Deposit TradFi Bonus",
+        "10% Deposit Bonus | Futures Bonus": "10% Deposit Futures Bonus",
+        "10% Deposit Bonus | Deposit Futures Bonus": "10% Deposit Futures Bonus",
+        "10% Deposit Bonus | 10% Deposit TradFi Bonus": "10% Deposit TradFi Bonus",
+        "10% Deposit Bonus | 10% Deposit Futures Bonus": "10% Deposit Futures Bonus",
+        "10% Deposit Bonus | TradFi": "10% Deposit TradFi Bonus",
+        "10% Deposit TradFi": "10% Deposit TradFi Bonus",
+        "Deposit Futures Bonus": "10% Deposit Futures Bonus",
+        "250% Deposit Bonus | TradFi Bonus": "250% Deposit Bonus",
+        "250% Deposit Bonus | Futures Bonus": "250% Deposit Bonus",
+        "250% Deposit Bonus | 250% Deposit Bonus": "250% Deposit Bonus",
+    },
+
+    // --- RESOLUTION HELPER ---
+    resolveEventConfig(eventName, eventType, isVip = false) {
+        const vipSuffix = isVip ? " (VIP)" : "";
+        const cleanName = (eventName || "").trim();
+        const cleanType = (eventType || "").trim();
+
+        // 1. Check explicit composite or single mapping if defined in eventMappings
+        if (cleanName && cleanType) {
+            const mappingKey = `${cleanName} | ${cleanType}`;
+            const mappedName = this.eventMappings?.[mappingKey];
+            if (mappedName) {
+                if (isVip && this.backgrounds[`${mappedName}${vipSuffix}`]) {
+                    return `${mappedName}${vipSuffix}`;
+                }
+                if (this.backgrounds[mappedName]) {
+                    return mappedName;
+                }
+            }
+        }
+        if (cleanName && this.eventMappings?.[cleanName]) {
+            const mappedName = this.eventMappings[cleanName];
+            if (isVip && this.backgrounds[`${mappedName}${vipSuffix}`]) {
+                return `${mappedName}${vipSuffix}`;
+            }
+            if (this.backgrounds[mappedName]) {
+                return mappedName;
+            }
+        }
+
+        // 2. Candidate keys in order of precedence
+        const candidateBases = [];
+        if (cleanName && cleanType) {
+            candidateBases.push(`${cleanName} - ${cleanType}`);
+            candidateBases.push(`${cleanName} ${cleanType}`);
+            candidateBases.push(`${cleanType} - ${cleanName}`);
+        }
+        if (cleanName) {
+            candidateBases.push(cleanName);
+        }
+        if (cleanType) {
+            candidateBases.push(cleanType);
+        }
+
+        for (const baseKey of candidateBases) {
+            if (isVip && this.backgrounds[`${baseKey}${vipSuffix}`]) {
+                return `${baseKey}${vipSuffix}`;
+            }
+            if (this.backgrounds[baseKey]) {
+                return baseKey;
+            }
+        }
+
+        return null;
     },
 
     // --- FILE PATHS ---
@@ -418,6 +489,90 @@ module.exports = {
                 template: "poster-template-v3.html" 
             }
         },
+        "10% Deposit TradFi Bonus": {
+            SignUp: { 
+                bg: "Sign Up-10% Deposit TradFi Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit TradFi Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "10% Deposit TradFi Bonus (VIP)": {
+            SignUp: { 
+                bg: "Sign Up-10% Deposit TradFi Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit TradFi Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46, useVipFeeBox: true, vipTop: 465, vipLeft: 48, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "10% Deposit Futures Bonus": {
+            SignUp: { 
+                bg: "Sign Up-10% Deposit Futures Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit Futures Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "10% Deposit Futures Bonus (VIP)": {
+            SignUp: { 
+                bg: "Sign Up-10% Deposit Futures Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-10% Deposit Futures Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46, useVipFeeBox: true, vipTop: 465, vipLeft: 48, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "250% Deposit Bonus": {
+            SignUp: { 
+                bg: "Sign Up-250% Deposit Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-250% Deposit Bonus.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "250% Deposit Bonus (VIP)": {
+            SignUp: { 
+                bg: "Sign Up-250% Deposit Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-250% Deposit Bonus VIP.png", 
+                width: 3408, height: 4080, 
+                layout: { useYubitXKol: true, scale: 3, headerTop: 43, headerLeft: 46, useVipFeeBox: true, vipTop: 465, vipLeft: 48, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
         "10% Deposit Bonus": {
             SignUp: { 
                 bg: "Sign-Up 10% Deposit.png", 
@@ -469,6 +624,62 @@ module.exports = {
             },
             Twitter: { 
                 bg: "Twitter-Position Voucher Package A 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package B 4.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package B 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package B 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package B 4.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package B 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 346, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package B 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Futures Bonus A 4.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus A 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus A 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Futures Bonus A 4.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Futures Bonus A 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 346, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Futures Bonus A 4.0 VIP Template.png", 
                 width: 3240, height: 3240, 
                 layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
                 template: "poster-template-v3.html" 

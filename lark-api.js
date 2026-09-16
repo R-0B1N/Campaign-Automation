@@ -83,6 +83,7 @@ async function getPendingRecords() {
             fields.ticket_id = extractLarkText(fields[config.schema.AUTO_NUMBER]);
             fields.kol_name = extractLarkText(fields[config.schema.KOL_NAME]); 
             fields.activity_record = extractLarkText(fields[config.schema.ACTIVITY_RECORD]);
+            fields.event_type = extractLarkText(fields[config.schema.EVENT_TYPE]);
             fields.vip_level = extractLarkText(fields[config.schema.VIP_LEVEL]);
             fields.vip_level_copy = extractLarkText(fields[config.schema.VIP_LEVEL_COPY]);
             fields.has_logo = hasLogo; 

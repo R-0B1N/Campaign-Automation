@@ -56,6 +56,7 @@ async function parseRecordData(record, vipMap) {
         ticket_id: fields.ticket_id,
         kol_name: fields.kol_name,
         activity_record: fields.activity_record,
+        event_type: fields.event_type || null,
         record_id: fields.record_id,
         vip_level: parsedVipLevel,
         should_generate_namecard: (fields.should_generate_namecard === 'Yes'),
@@ -72,20 +73,18 @@ async function parseRecordData(record, vipMap) {
     };
 }
 
-// --- NEW: Extracted the single-record processing logic into its own function ---
+// --- Single-record processing logic ---
 async function processSingleRecord(record, vipMap) {
     const ticketId = record.fields.ticket_id || record.record_id;
 
     const data = await parseRecordData(record, vipMap);
     if (!data) return;
 
-    let eventType = data.activity_record.trim();
-    if (data.vip_level > 0 && config.backgrounds[`${eventType} (VIP)`]) {
-        eventType = `${eventType} (VIP)`;
-    }
+    const isVip = data.vip_level > 0;
+    const resolvedEventType = config.resolveEventConfig(data.activity_record, data.event_type, isVip);
 
-    if (!config.backgrounds[eventType]) {
-        console.warn(`⚠️ Unknown Event Type '${eventType}' for ${ticketId}. Posters will be skipped.`);
+    if (!resolvedEventType || !config.backgrounds[resolvedEventType]) {
+        console.warn(`⚠️ Unknown Event Name '${data.activity_record}' / Event Type '${data.event_type || 'N/A'}' for ${ticketId}. Posters will be skipped.`);
     }
 
     const saneKolName = String(data.kol_name).replace(/[\r\n]/g, '').replace(/[\\?%*:|"<> \/]/g, '_');
@@ -93,7 +92,9 @@ async function processSingleRecord(record, vipMap) {
 
     // Process all image types sequentially for this specific record
     await processNamecard(data, saneKolName, tokens);
-    await processPosters(data, eventType, saneKolName, tokens);
+    if (resolvedEventType && config.backgrounds[resolvedEventType]) {
+        await processPosters(data, resolvedEventType, saneKolName, tokens);
+    }
     await processLpProfile(data, saneKolName, tokens);
 
     if (config.toggles.UPLOAD_TO_LARK) {
