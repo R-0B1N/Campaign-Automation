@@ -31,9 +31,7 @@ module.exports = {
         KOL_UID: "KOL UID",
         VIP_CODE: "VIP Code",
         VIP_LEVEL: "VIP Level",
-        VIP_LEVEL_COPY: "VIP Level (Old)",
-        // VIP_LEVEL: "VIP Level (Old)",
-        // VIP_LEVEL_COPY: "VIP Level",
+        VIP_LEVEL_OLD: "VIP Level (Old)",
         FIRST_TIME_KOL: "Namecard",
         SIGN_UP_MATERIAL: "Sign Up Page 物料",
         TWITTER_MATERIAL: "Twitter 物料",
@@ -492,7 +490,7 @@ module.exports = {
         "10% Deposit TradFi Bonus": {
             SignUp: { 
                 bg: "Sign Up-10% Deposit TradFi Bonus.png", 
-                width: 3408, height: 4080, 
+                width: 3240, height: 3240, 
                 layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
                 template: "poster-template-v3.html"
             },
@@ -506,8 +504,8 @@ module.exports = {
         "10% Deposit TradFi Bonus (VIP)": {
             SignUp: { 
                 bg: "Sign Up-10% Deposit TradFi Bonus VIP.png", 
-                width: 3408, height: 4080, 
-                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 325, vipLeft: 37, vipWidth: 527.24, vipHeight: 62.59, vipFontSize: 29.5, vipDiamondWidth: 44 }, 
                 template: "poster-template-v3.html" 
             },
             Twitter: { 
@@ -520,7 +518,7 @@ module.exports = {
         "10% Deposit Futures Bonus": {
             SignUp: { 
                 bg: "Sign Up-10% Deposit Futures Bonus.png", 
-                width: 3408, height: 4080, 
+                width: 3240, height: 3240, 
                 layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
                 template: "poster-template-v3.html"
             },
@@ -534,8 +532,8 @@ module.exports = {
         "10% Deposit Futures Bonus (VIP)": {
             SignUp: { 
                 bg: "Sign Up-10% Deposit Futures Bonus VIP.png", 
-                width: 3408, height: 4080, 
-                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 325, vipLeft: 37, vipWidth: 527.24, vipHeight: 62.59, vipFontSize: 29.5, vipDiamondWidth: 44 }, 
                 template: "poster-template-v3.html" 
             },
             Twitter: { 
@@ -548,7 +546,7 @@ module.exports = {
         "250% Deposit Bonus": {
             SignUp: { 
                 bg: "Sign Up-250% Deposit Bonus.png", 
-                width: 3408, height: 4080, 
+                width: 3240, height: 3240, 
                 layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
                 template: "poster-template-v3.html"
             },
@@ -562,8 +560,8 @@ module.exports = {
         "250% Deposit Bonus (VIP)": {
             SignUp: { 
                 bg: "Sign Up-250% Deposit Bonus VIP.png", 
-                width: 3408, height: 4080, 
-                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 356, vipLeft: 46, vipWidth: 584, vipHeight: 65, vipFontSize: 32.5, vipDiamondWidth: 46.41 }, 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 325, vipLeft: 37, vipWidth: 527.24, vipHeight: 62.59, vipFontSize: 29.5, vipDiamondWidth: 44 }, 
                 template: "poster-template-v3.html" 
             },
             Twitter: { 

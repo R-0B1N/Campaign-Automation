@@ -78,7 +78,7 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
         await page.setContent(finalHtml, { waitUntil: 'load' });
         await new Promise(resolve => setTimeout(resolve, 250)); // Render buffer
 
-        await page.screenshot({ path: fullOutputPath, type: 'png' });
+        await page.screenshot({ path: fullOutputPath, type: 'png', omitBackground: true });
         await browser.close();
 
         return fullOutputPath;

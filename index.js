@@ -18,6 +18,35 @@ function chunkArray(array, size) {
     return chunked;
 }
 
+function resolveVipLevel(fields, vipMap) {
+    const parseField = (val) => {
+        if (!val) return 0;
+        let str = String(val).trim();
+        if (vipMap && vipMap[str]) {
+            str = `VIP ${vipMap[str].replace(/\D/g, '')}`;
+        }
+        return parseInt(str.replace(/\D/g, ''), 10) || 0;
+    };
+
+    const newTier = parseField(fields.vip_level);
+    const oldTier = parseField(fields.vip_level_old || fields.vip_level_copy);
+    const identifier = fields.ticket_id || fields.kol_name || fields.record_id || 'Unknown';
+
+    if (newTier > 0) {
+        if (oldTier > 0 && oldTier !== newTier) {
+            console.warn(`⚠️ [${identifier}] VIP conflict: New VIP (${newTier}) vs Old VIP (${oldTier}). Prioritizing New VIP.`);
+        }
+        return newTier;
+    }
+
+    if (oldTier > 0) {
+        console.log(`ℹ️ [${identifier}] Dynamically resolved VIP Level ${oldTier} from 'VIP Level (Old)'.`);
+        return oldTier;
+    }
+
+    return 0;
+}
+
 async function parseRecordData(record, vipMap) {
     const { fields } = record;
     if (!fields.kol_name || !fields.ticket_id || !fields.activity_record) return null;
@@ -31,12 +60,7 @@ async function parseRecordData(record, vipMap) {
         }
     }
 
-    let rawVip = String(fields.vip_level || '');
-    if (vipMap && vipMap[rawVip]) {
-        rawVip = `VIP ${vipMap[rawVip].replace(/\D/g, '')}`;
-    }
-
-    const parsedVipLevel = parseInt(rawVip.replace(/\D/g, ''), 10) || 0;
+    const parsedVipLevel = resolveVipLevel(fields, vipMap);
     
     // Calculate the exact percentage OFF based on the Futures Taker fee table (Base 0.04%)
     const discountMap = { 1: 12.5, 2: 25, 3: 37.5, 4: 50, 5: 62.5, 6: 75, 7: 80, 8: 100 };
@@ -139,7 +163,15 @@ async function main() {
     console.log("\n🎉 All batches complete. Automation finished.");
 }
 
-main().catch(error => {
-    console.error("A critical error occurred in main:", error);
-    process.exit(1);
-});
+if (require.main === module) {
+    main().catch(error => {
+        console.error("A critical error occurred in main:", error);
+        process.exit(1);
+    });
+}
+
+module.exports = {
+    resolveVipLevel,
+    parseRecordData,
+    processSingleRecord
+};

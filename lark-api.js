@@ -85,7 +85,8 @@ async function getPendingRecords() {
             fields.activity_record = extractLarkText(fields[config.schema.ACTIVITY_RECORD]);
             fields.event_type = extractLarkText(fields[config.schema.EVENT_TYPE]);
             fields.vip_level = extractLarkText(fields[config.schema.VIP_LEVEL]);
-            fields.vip_level_copy = extractLarkText(fields[config.schema.VIP_LEVEL_COPY]);
+            fields.vip_level_old = extractLarkText(fields[config.schema.VIP_LEVEL_OLD]);
+            fields.vip_level_copy = fields.vip_level_old;
             fields.has_logo = hasLogo; 
             fields.kol_logo_url = logoUrl; 
             
@@ -168,34 +169,48 @@ async function getVipOptionMapping() {
     try {
         const token = await getTenantAccessToken();
         
-        // 1. Get the VIP Level field metadata from the main table
+        // 1. Get field metadata from the main table
         let fieldsUrl = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${config.lark.TABLE_ID}/fields`;
         let response = await axios.get(fieldsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+        const allFields = response.data?.data?.items || [];
         
-        let vipField = response.data.data.items.find(f => f.field_name === config.schema.VIP_LEVEL);
-        if (!vipField || !vipField.property) {
-            return {}; 
-        }
-        
-        const targetTableId = vipField.property.target_table || (vipField.property.filter_info && vipField.property.filter_info.target_table);
-        const targetFieldId = vipField.property.target_field;
-
-        if (!targetTableId || !targetFieldId) return {};
-
-        // 2. Get the target field metadata from the target table
-        let targetFieldsUrl = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${targetTableId}/fields`;
-        response = await axios.get(targetFieldsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
-        
-        let targetField = response.data.data.items.find(f => f.field_id === targetFieldId);
-        if (!targetField || !targetField.property || !targetField.property.options) {
-            return {};
-        }
-
-        // 3. Build the map
+        const targetFieldNames = [config.schema.VIP_LEVEL, config.schema.VIP_LEVEL_OLD].filter(Boolean);
         const map = {};
-        targetField.property.options.forEach(opt => {
-            map[opt.id] = opt.name;
-        });
+
+        for (const fieldName of targetFieldNames) {
+            let vipField = allFields.find(f => f.field_name === fieldName);
+            if (!vipField || !vipField.property) continue;
+
+            // Direct select options
+            if (vipField.property.options && Array.isArray(vipField.property.options)) {
+                vipField.property.options.forEach(opt => {
+                    if (opt && opt.id && opt.name) {
+                        map[opt.id] = opt.name;
+                    }
+                });
+            }
+
+            // Linked table options (Lookup / Two-way link)
+            const targetTableId = vipField.property.target_table || (vipField.property.filter_info && vipField.property.filter_info.target_table);
+            const targetFieldId = vipField.property.target_field;
+
+            if (targetTableId && targetFieldId) {
+                try {
+                    let targetFieldsUrl = `https://open.larksuite.com/open-apis/bitable/v1/apps/${config.lark.BASE_ID}/tables/${targetTableId}/fields`;
+                    let targetResponse = await axios.get(targetFieldsUrl, { headers: { 'Authorization': `Bearer ${token}` } });
+                    let targetField = targetResponse.data?.data?.items?.find(f => f.field_id === targetFieldId);
+                    if (targetField && targetField.property && targetField.property.options) {
+                        targetField.property.options.forEach(opt => {
+                            if (opt && opt.id && opt.name) {
+                                map[opt.id] = opt.name;
+                            }
+                        });
+                    }
+                } catch (subErr) {
+                    console.warn(`⚠️ Failed to fetch options for linked field '${fieldName}':`, subErr.message);
+                }
+            }
+        }
 
         return map;
     } catch (error) {
