@@ -136,7 +136,7 @@
             font-family: 'Poppins', sans-serif;
             font-weight: {{vip_font_weight}};
             font-size: calc({{vip_font_size}}px * var(--scale));
-            line-height: calc(45px * var(--scale));
+            line-height: 1.2;
             color: #FFFFFF;
             white-space: nowrap;
             flex: none;
@@ -241,6 +241,23 @@
                         fontSize -= 2;
                         kolName.style.fontSize = fontSize + 'px';
                     }
+                }
+            }
+
+            // Dynamically fit VIP text into the pill box
+            const vipHighlight = document.querySelector('.vip-highlight');
+            const vipText = document.querySelector('.vip-text');
+            if (vipHighlight && vipText) {
+                const buffer = 8 * (Number("{{header_scale}}") || 1.0);
+                let vipFontSize = parseFloat(window.getComputedStyle(vipText).fontSize);
+                while (vipFontSize > 12) {
+                    const boxRect = vipHighlight.getBoundingClientRect();
+                    const textRect = vipText.getBoundingClientRect();
+                    if (textRect.right <= boxRect.right - buffer) {
+                        break;
+                    }
+                    vipFontSize -= 0.5;
+                    vipText.style.fontSize = vipFontSize + 'px';
                 }
             }
         });

@@ -73,7 +73,7 @@ async function parseRecordData(record, vipMap) {
         : null;
         
     const twitterVipText = parsedVipLevel > 0
-        ? `Instant&nbsp;<span class="vip-gold">VIP ${parsedVipLevel}</span>&nbsp;:&nbsp;${discountPercent}% OFF Fees`
+        ? config.getVipFeeText(parsedVipLevel, discountPercent)
         : null;
 
     return {

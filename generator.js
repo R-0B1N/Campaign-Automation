@@ -45,7 +45,7 @@ async function processPosters(data, eventType, saneKolName, tokens) {
         formatPosterData.use_yubit_x_kol = !!layout?.useYubitXKol;
         formatPosterData.hide_yubit_logo = !!layout?.hideYubitLogo;
         formatPosterData.use_vip_card_text = !!layout?.useVipCardText;
-        
+
         formatPosterData.header_top = layout?.headerTop || 42;
         formatPosterData.header_left = layout?.headerLeft || 51;
         formatPosterData.vip_top = layout?.vipTop || 403;
@@ -62,8 +62,13 @@ async function processPosters(data, eventType, saneKolName, tokens) {
             formatPosterData.vip_discount_percent = discountMap[formatPosterData.vip_level] || 0;
         }
 
+        const isCustomFeeVip = config.vipFeeSchedule?.[formatPosterData.vip_level]?.isCustomFee;
+
         if (layout?.useVipFeeBox && formatPosterData.vip_level > 0) {
-            formatPosterData.vip_text = `INSTANT <span class="vip-gold">VIP ${formatPosterData.vip_level}</span> : ${formatPosterData.vip_discount_percent}% OFF FEES`;
+            formatPosterData.vip_text = config.getVipFeeText(formatPosterData.vip_level, formatPosterData.vip_discount_percent);
+            if (isCustomFeeVip) {
+                formatPosterData.vip_font_size = layout?.vipFeeFontSize || 23.5;
+            }
         } else if (layout?.useVipPillBox && formatPosterData.vip_level > 0) {
             // Check if plainVipText is specified in layout to avoid applying gold color
             if (layout?.plainVipText) {
@@ -76,7 +81,7 @@ async function processPosters(data, eventType, saneKolName, tokens) {
         } else if (formatName === 'Twitter' && formatPosterData.twitterVipText) {
             formatPosterData.vip_text = layout?.useSignUpVipText ? formatPosterData.signUpVipText : formatPosterData.twitterVipText;
         }
-        
+
         formatPosterData.is_twitter = (formatName === 'Twitter');
         formatPosterData.show_twitter_box = (formatName === 'Twitter' && !layout?.vipNoBox);
 

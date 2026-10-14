@@ -54,6 +54,29 @@ module.exports = {
         "250% Deposit Bonus | 250% Deposit Bonus": "250% Deposit Bonus",
     },
 
+    // --- VIP FEE SCHEDULE & FORMATTER ---
+    vipFeeSchedule: {
+        1: { text: "0.035% Maker / 0.07% Taker", isCustomFee: true },
+        2: { discountPercent: 25, isCustomFee: false },
+        3: { text: "0.025% Maker / 0.05% Taker", isCustomFee: true },
+        4: { discountPercent: 50, isCustomFee: false },
+        5: { text: "0.015% Maker / 0.035% Taker", isCustomFee: true },
+        6: { discountPercent: 75, isCustomFee: false },
+        7: { text: "0.008% Maker / 0.025% Taker", isCustomFee: true },
+        8: { text: "0% Maker / 0.02% Taker", isCustomFee: true },
+    },
+
+    getVipFeeText(vipLevel, discountPercent) {
+        const level = parseInt(String(vipLevel).replace(/\D/g, ''), 10);
+        if (!level) return null;
+        const entry = this.vipFeeSchedule?.[level];
+        if (entry?.isCustomFee) {
+            return `INSTANT <span class="vip-gold">VIP ${level}</span> : ${entry.text}`;
+        }
+        const pct = discountPercent || entry?.discountPercent || (level === 2 ? 25 : level === 4 ? 50 : level === 6 ? 75 : 0);
+        return `INSTANT <span class="vip-gold">VIP ${level}</span> : ${pct}% OFF FEES`;
+    },
+
     // --- RESOLUTION HELPER ---
     resolveEventConfig(eventName, eventType, isVip = false) {
         const vipSuffix = isVip ? " (VIP)" : "";
@@ -650,6 +673,62 @@ module.exports = {
             },
             Twitter: { 
                 bg: "Twitter-Position Voucher Package B 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package C 4.0": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package C 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package C 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher Package C 4.0 (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Package C 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 346, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Package C 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher 4.0 Iran": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Iran 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3 },
+                template: "poster-template-v3.html"
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Iran 4.0 Template.png", 
+                width: 3240, height: 3240, 
+                layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345 },
+                template: "poster-template-v3.html" 
+            }
+        },
+        "Position Voucher 4.0 Iran (VIP)": {
+            SignUp: { 
+                bg: "Sign Up Page-Position Voucher Iran 4.0 VIP Template.png", 
+                width: 3240, height: 3240, 
+                layout: { top: -9999, left: 0, align: "center", maxW: 100, scale: 3, useVipFeeBox: true, vipTop: 346, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
+                template: "poster-template-v3.html" 
+            },
+            Twitter: { 
+                bg: "Twitter-Position Voucher Iran 4.0 VIP Template.png", 
                 width: 3240, height: 3240, 
                 layout: { useYubitXKol: true, hideYubitLogo: true, scale: 3, headerTop: 28, headerLeft: 345, useVipFeeBox: true, vipTop: 421, vipLeft: 29, vipWidth: 543, vipHeight: 65, vipFontSize: 30 }, 
                 template: "poster-template-v3.html" 

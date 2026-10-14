@@ -60,7 +60,7 @@ async function generateImage(templateData, outputFilename, bgFileName, width = 1
             vip_left: layout.vipLeft || 51,
             vip_width: layout.vipWidth || 468,
             vip_height: layout.vipHeight || 65,
-            vip_font_size: layout.vipFontSize || 30,
+            vip_font_size: templateData.vip_font_size || layout.vipFontSize || 30,
             vip_font_weight: layout.vipFontWeight || 700,
             vip_diamond_width: layout.vipDiamondWidth || 48,
             vip_card_top: layout.vipCardTop || 616,
