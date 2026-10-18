@@ -706,7 +706,7 @@ module.exports = {
                 template: "poster-template-v3.html" 
             }
         },
-        "Position Voucher 4.0 Iran": {
+        "Position Voucher 4.0 Iran & Vietnam": {
             SignUp: { 
                 bg: "Sign Up Page-Position Voucher Iran 4.0 Template.png", 
                 width: 3240, height: 3240, 
@@ -720,7 +720,7 @@ module.exports = {
                 template: "poster-template-v3.html" 
             }
         },
-        "Position Voucher 4.0 Iran (VIP)": {
+        "Position Voucher 4.0 Iran & Vietnam (VIP)": {
             SignUp: { 
                 bg: "Sign Up Page-Position Voucher Iran 4.0 VIP Template.png", 
                 width: 3240, height: 3240, 
